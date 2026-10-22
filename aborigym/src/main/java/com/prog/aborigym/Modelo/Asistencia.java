@@ -74,6 +74,6 @@ public class Asistencia {
 
     @Override
     public String toString() {
-        return "Fecha Asistencia = " + fechaAsistencia + " - Socio = " + socio + " en " + clase;
+        return "Fecha Asistencia: " + fechaAsistencia + " - Socio: " + socio + " en " + clase;
     }
 }

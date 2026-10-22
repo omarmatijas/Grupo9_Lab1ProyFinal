@@ -19,21 +19,21 @@ public class Pase {
     public Pase() {
     }
 
-    public Pase(Socio socio, int cantidadEntradas, LocalDate fechaInicio, LocalDate fechaFin, double costo, boolean estado) {
+    public Pase(Socio socio, int cantidadEntradas, LocalDate fechaInicio, double costo, boolean estado) {
         this.socio = socio;
         this.cantidadEntradas = cantidadEntradas;
         this.fechaInicio = fechaInicio;
-        this.fechaFin = fechaFin;
+        this.fechaFin = fechaInicio.plusDays(30);
         this.costo = costo;
         this.estado = estado;
     }
 
-    public Pase(int idPase, Socio socio, int cantidadEntradas, LocalDate fechaInicio, LocalDate fechaFin, double costo, boolean estado) {
+    public Pase(int idPase, Socio socio, int cantidadEntradas, LocalDate fechaInicio, double costo, boolean estado) {
         this.idPase = idPase;
         this.socio = socio;
         this.cantidadEntradas = cantidadEntradas;
         this.fechaInicio = fechaInicio;
-        this.fechaFin = fechaFin;
+        this.fechaFin = fechaInicio.plusDays(30);
         this.costo = costo;
         this.estado = estado;
     }
@@ -94,8 +94,13 @@ public class Pase {
         this.estado = estado;
     }
 
+    
+    public void registrarAsistencia() {
+        this.cantidadEntradas-=1;
+    }
+    
     @Override
     public String toString() {
-        return "Pase " + idPase + " - Entradas = " + cantidadEntradas + " (Vence " + fechaFin + ')';
+        return "Pase " + idPase + " - Entradas: " + cantidadEntradas + " (Vence " + fechaFin + ')';
     }
 }

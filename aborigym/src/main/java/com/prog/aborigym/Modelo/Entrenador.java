@@ -83,6 +83,6 @@ public class Entrenador {
 
     @Override
     public String toString() {
-        return apellido + ", " + nombre + " (" + especialidad + ")";
+        return nombre + " " + apellido + " (" + especialidad + ")";
     }
 }
