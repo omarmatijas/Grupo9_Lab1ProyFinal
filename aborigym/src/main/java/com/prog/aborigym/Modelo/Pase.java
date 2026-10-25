@@ -7,7 +7,7 @@ import java.time.LocalDate;
  * @author Grupo9
  */
 public class Pase {
-    
+
     private int idPase;
     private Socio socio;
     private int cantidadEntradas;
@@ -16,9 +16,7 @@ public class Pase {
     private double costo;
     private boolean estado;
 
-    public Pase() {
-    }
-
+    // No es necesario el constructor vacío, por ahora public Pase() { } 
     public Pase(Socio socio, int cantidadEntradas, LocalDate fechaInicio, double costo, boolean estado) {
         this.socio = socio;
         this.cantidadEntradas = cantidadEntradas;
@@ -94,11 +92,10 @@ public class Pase {
         this.estado = estado;
     }
 
-    
     public void registrarAsistencia() {
-        this.cantidadEntradas-=1;
+        this.cantidadEntradas -= 1;
     }
-    
+
     @Override
     public String toString() {
         return "Pase " + idPase + " - Entradas: " + cantidadEntradas + " (Vence " + fechaFin + ')';

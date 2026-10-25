@@ -15,9 +15,7 @@ public class ClaseGym {
     private int capacidad;
     private boolean estado;
 
-    public ClaseGym() {
-    }
-
+    // No es necesario el constructor vacío, por ahora public ClaseGym() { } 
     public ClaseGym(String disciplina, Entrenador entrenador, LocalTime horario, int capacidad, boolean estado) {
         this.disciplina = disciplina;
         this.entrenador = entrenador;

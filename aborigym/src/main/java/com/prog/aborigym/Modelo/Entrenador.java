@@ -5,7 +5,7 @@ package com.prog.aborigym.Modelo;
  * @author Grupo9
  */
 public class Entrenador {
-    
+
     private int idEntrenador;
     private String dni;
     private String nombre;
@@ -13,9 +13,7 @@ public class Entrenador {
     private String especialidad;
     private boolean estado;
 
-    public Entrenador() {
-    }
-
+    // No es necesario el constructor vacío, por ahora public Entrenador() { } 
     public Entrenador(String dni, String nombre, String apellido, String especialidad, boolean estado) {
         this.dni = dni;
         this.nombre = nombre;

@@ -14,9 +14,7 @@ public class Asistencia {
     private Pase pase;
     private LocalDate fechaAsistencia;
 
-    public Asistencia() {
-    }
-
+    // No es necesario el constructor vacío, por ahora public Asistencia() { } 
     public Asistencia(Socio socio, ClaseGym clase, Pase pase, LocalDate fechaAsistencia) {
         this.socio = socio;
         this.clase = clase;

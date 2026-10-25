@@ -15,8 +15,7 @@ public class Socio {
     private String telefono;
     private boolean estado;
 
-    public Socio() {
-    }
+    // No es necesario el constructor vacío, por ahora public Socio() { } 
 
     public Socio(String dni, String nombre, String apellido, int edad, String correo, String telefono, boolean estado) {
         this.dni = dni;
