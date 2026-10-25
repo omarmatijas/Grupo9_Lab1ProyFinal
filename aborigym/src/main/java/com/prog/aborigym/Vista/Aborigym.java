@@ -5,7 +5,9 @@ import com.prog.aborigym.Modelo.ClaseGym;
 import com.prog.aborigym.Modelo.Entrenador;
 import com.prog.aborigym.Modelo.Pase;
 import com.prog.aborigym.Modelo.Socio;
+import com.prog.aborigym.Persistencia.ClaseGymData;
 import com.prog.aborigym.Persistencia.Conexion;
+import com.prog.aborigym.Persistencia.EntrenadorData;
 import com.prog.aborigym.Persistencia.SocioData;
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -18,7 +20,7 @@ import java.time.LocalTime;
 public class Aborigym {
 
     private static final String HOST = "localhost";
-    private static final String PORT = "3306";
+    private static final String PORT = "3307";
     private static final String DB_NAME = "grupo9_aborigym";
     private static final String USER = "root";
     private static final String PASSWORD = "";
@@ -46,10 +48,16 @@ public class Aborigym {
     }
 
     public static void pruebaDatos(Conexion conexion) throws SQLException {
+        Socio omar = pruebasSocios(conexion);
+        Entrenador juan = pruebaEntrenador(conexion);
+        ClaseGym spinning = pruebaClase(conexion, juan);
+        Pase pase = pruebaPase(omar);
+        pruebaAsistencia(omar, spinning, pase);
+    }
 
+    public static Socio pruebasSocios(Conexion conexion) throws SQLException {
         SocioData socioData = new SocioData(conexion);
 
-        // Socios
         Socio omar = new Socio("30334915", "Omar", "Matijas", 43, "omarmatijas@gmail.com", "2665103445", true);
         int idOmar = socioData.guardarSocio(omar);
         omar.setIdSocio(idOmar);
@@ -70,35 +78,52 @@ public class Aborigym {
         jessica.setIdSocio(idJessica);
         System.out.println("Socio: " + jessica);
 
-        // Entrenador
-        Entrenador juan = new Entrenador("25333444", "Juan", "Gómez", "Spinning", true);
-        juan.setIdEntrenador(1);
-        System.out.println("Entrenador: " + juan);
+        return omar;
+    }
 
-        // Clase
-        ClaseGym spinning = new ClaseGym("Spinning", juan, LocalTime.of(18, 0), 20, true);
-        spinning.setIdClase(1);
+    public static Entrenador pruebaEntrenador(Conexion conexion) throws SQLException {
+        EntrenadorData entrenadorData = new EntrenadorData(conexion);
+        Entrenador juan = new Entrenador("25333444", "Juan", "Gómez", "Spinning", true);
+        int idJuan = entrenadorData.guardarEntrenador(juan);
+        juan.setIdEntrenador(idJuan);
+        System.out.println("Entrenador: " + juan);
+        System.out.println("Entrenador por DNI: " + entrenadorData.buscarEntrenadorPorDNI("25333444"));
+        return juan;
+    }
+
+    public static ClaseGym pruebaClase(Conexion conexion, Entrenador entrenador) throws SQLException {
+        ClaseGymData claseGymData = new ClaseGymData(conexion);
+        ClaseGym spinning = new ClaseGym("Spinning", entrenador, LocalTime.of(18, 0), 20, true);
+        int idSpinning = claseGymData.guardarClaseGym(spinning);
+        spinning.setIdClase(idSpinning);
         System.out.println("Clase: " + spinning);
         System.out.println("  Entrenador de la clase: " + spinning.getEntrenador().getNombre());
 
-        // Pase
-        Pase pase = new Pase(omar, 8, LocalDate.of(2026, 10, 1), 15000.0, true);
+        System.out.println("Clases de Spinning:");
+        for (ClaseGym clase : claseGymData.listarClasesGymPorDisciplina("Spinning")) {
+            System.out.println("  " + clase + " - " + clase.getEntrenador());
+        }
+        return spinning;
+    }
+
+    public static Pase pruebaPase(Socio socio) {
+        Pase pase = new Pase(socio, 8, LocalDate.of(2026, 10, 1), 15000.0, true);
         pase.setIdPase(1);
         System.out.println("Pase: " + pase);
         System.out.println("  Inicio: " + pase.getFechaInicio() + " | Fin: " + pase.getFechaFin());
         System.out.println("  Titular: " + pase.getSocio());
+        return pase;
+    }
 
-        // Asistencia
-        Asistencia asistencia = new Asistencia(omar, spinning, pase, LocalDate.now());
+    public static void pruebaAsistencia(Socio socio, ClaseGym clase, Pase pase) {
+        Asistencia asistencia = new Asistencia(socio, clase, pase, LocalDate.now());
         asistencia.setIdAsistencia(1);
         System.out.println("Asistencia: " + asistencia);
 
-        // Ana consume una entrada
         System.out.println("Entradas antes: " + pase.getCantidadEntradas());
         pase.registrarAsistencia();
         System.out.println("Entradas después: " + pase.getCantidadEntradas());
 
-        // Relaciones
         System.out.println("El socio " + asistencia.getSocio().getNombre()
                 + " asistió a " + asistencia.getClase().getDisciplina()
                 + " con " + asistencia.getClase().getEntrenador().getNombre());
