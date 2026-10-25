@@ -34,8 +34,7 @@ CREATE TABLE `asistencia` (
   `id_socio` int(11) NOT NULL,
   `id_clase` int(11) NOT NULL,
   `id_pase` int(11) NOT NULL,
-  `fecha_asistencia` date NOT NULL,
-  `estado` tinyint(1) NOT NULL DEFAULT 1
+  `fecha_asistencia` date NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
