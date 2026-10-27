@@ -4,6 +4,8 @@
  */
 package com.prog.aborigym.Vista;
 
+import com.prog.aborigym.Persistencia.Conexion;
+
 /**
  *
  * @author usuario
@@ -13,7 +15,7 @@ public class VistaEntrenadores extends javax.swing.JInternalFrame {
     /**
      * Creates new form VistaEntrenadores
      */
-    public VistaEntrenadores() {
+    public VistaEntrenadores(Conexion con) {
         initComponents();
     }
 
@@ -25,6 +27,9 @@ public class VistaEntrenadores extends javax.swing.JInternalFrame {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+
+        setTitle("Gestión de entrenadores");
+        setToolTipText("");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);

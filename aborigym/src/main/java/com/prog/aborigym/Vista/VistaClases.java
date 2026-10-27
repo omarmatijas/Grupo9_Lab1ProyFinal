@@ -4,6 +4,8 @@
  */
 package com.prog.aborigym.Vista;
 
+import com.prog.aborigym.Persistencia.Conexion;
+
 /**
  *
  * @author usuario
@@ -13,7 +15,7 @@ public class VistaClases extends javax.swing.JInternalFrame {
     /**
      * Creates new form VistaClases
      */
-    public VistaClases() {
+    public VistaClases(Conexion con) {
         initComponents();
     }
 
@@ -25,6 +27,8 @@ public class VistaClases extends javax.swing.JInternalFrame {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+
+        setTitle("Gestión de clases");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);

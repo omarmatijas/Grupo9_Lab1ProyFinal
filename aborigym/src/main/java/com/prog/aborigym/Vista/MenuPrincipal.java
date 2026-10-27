@@ -52,6 +52,35 @@ public class MenuPrincipal extends javax.swing.JFrame {
         }
     }
     
+    private void mostrar(javax.swing.JInternalFrame ventana) {
+        if (ventana.getParent() == null) {
+            ventana.setSize(TAMANIO_VENTANA);
+            ventana.setClosable(true);
+            ventana.setIconifiable(true);
+            ventana.setMaximizable(false);
+            ventana.setResizable(false);
+            escritorio.add(ventana);
+            
+            centrar(ventana);    
+        }
+        
+        ventana.setVisible(true);
+        ventana.toFront();
+        
+        try {
+            ventana.setSelected(true);
+        } catch (java.beans.PropertyVetoException ex) {
+            
+        }
+    }
+    
+    private void centrar(javax.swing.JInternalFrame ventana) {
+        int x = (escritorio.getWidth() - ventana.getWidth()) / 2;
+        int y = (escritorio.getHeight()- ventana.getHeight()) / 2;
+        
+        ventana.setLocation(Math.max(x, 0), Math.max(y, 0));
+    }
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -61,7 +90,7 @@ public class MenuPrincipal extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        Escritorio = new javax.swing.JDesktopPane();
+        escritorio = new javax.swing.JDesktopPane();
         menuBar = new javax.swing.JMenuBar();
         menuSocios = new javax.swing.JMenu();
         gestionSocios = new javax.swing.JMenuItem();
@@ -75,17 +104,16 @@ public class MenuPrincipal extends javax.swing.JFrame {
         salir = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Aborigym");
 
-        Escritorio.setName("Escritorio"); // NOI18N
-
-        javax.swing.GroupLayout EscritorioLayout = new javax.swing.GroupLayout(Escritorio);
-        Escritorio.setLayout(EscritorioLayout);
-        EscritorioLayout.setHorizontalGroup(
-            EscritorioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        javax.swing.GroupLayout escritorioLayout = new javax.swing.GroupLayout(escritorio);
+        escritorio.setLayout(escritorioLayout);
+        escritorioLayout.setHorizontalGroup(
+            escritorioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 569, Short.MAX_VALUE)
         );
-        EscritorioLayout.setVerticalGroup(
-            EscritorioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        escritorioLayout.setVerticalGroup(
+            escritorioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 422, Short.MAX_VALUE)
         );
 
@@ -128,6 +156,11 @@ public class MenuPrincipal extends javax.swing.JFrame {
         menuPases.setText("Pases");
 
         gestionPases.setText("Gestión de pases");
+        gestionPases.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                gestionPasesActionPerformed(evt);
+            }
+        });
         menuPases.add(gestionPases);
 
         menuBar.add(menuPases);
@@ -145,29 +178,43 @@ public class MenuPrincipal extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(Escritorio, javax.swing.GroupLayout.Alignment.TRAILING)
+            .addComponent(escritorio)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGap(0, 0, Short.MAX_VALUE)
-                .addComponent(Escritorio, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+            .addComponent(escritorio)
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void gestionSociosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_gestionSociosActionPerformed
-        // TODO add your handling code here:
+        if (vistaSocios  == null || vistaSocios.isClosed()) {
+            vistaSocios = new VistaSocios(con);
+        }
+        mostrar(vistaSocios);
     }//GEN-LAST:event_gestionSociosActionPerformed
 
     private void gestionClasesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_gestionClasesActionPerformed
-        // TODO add your handling code here:
+        if (vistaClases  == null || vistaClases.isClosed()) {
+            vistaClases = new VistaClases(con);
+        }
+        mostrar(vistaClases);
     }//GEN-LAST:event_gestionClasesActionPerformed
 
     private void gestionEntrenadoresActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_gestionEntrenadoresActionPerformed
-        // TODO add your handling code here:
+        if (vistaEntrenadores  == null || vistaEntrenadores.isClosed()) {
+            vistaEntrenadores = new VistaEntrenadores(con);
+        }
+        mostrar(vistaEntrenadores);
     }//GEN-LAST:event_gestionEntrenadoresActionPerformed
+
+    private void gestionPasesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_gestionPasesActionPerformed
+        if (vistaPases  == null || vistaPases.isClosed()) {
+            vistaPases = new VistaPases(con);
+        }
+        mostrar(vistaPases);
+    }//GEN-LAST:event_gestionPasesActionPerformed
 
     /**
      * @param args the command line arguments
@@ -205,7 +252,7 @@ public class MenuPrincipal extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JDesktopPane Escritorio;
+    private javax.swing.JDesktopPane escritorio;
     private javax.swing.JMenuItem gestionClases;
     private javax.swing.JMenuItem gestionEntrenadores;
     private javax.swing.JMenuItem gestionPases;
