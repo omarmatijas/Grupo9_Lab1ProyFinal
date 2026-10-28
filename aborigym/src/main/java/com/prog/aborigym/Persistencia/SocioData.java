@@ -5,6 +5,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -18,6 +20,19 @@ public class SocioData {
         this.conexion = conexion;
     }
 
+    public List<Socio> listarSocios() throws SQLException {
+        String sql = "SELECT * FROM socio ORDER BY apellido, nombre";
+        List<Socio> socios = new ArrayList<>();
+        
+        try (PreparedStatement ps = conexion.buscarConexion().prepareStatement(sql);
+            ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                socios.add(parsearRS(rs));
+            }
+        }
+        return socios;
+    }
+    
     public int guardarSocio(Socio socio) throws SQLException {
         String sql = "INSERT INTO socio(dni, nombre, apellido, edad, correo, telefono, estado) VALUES (?,?,?,?,?,?,?)";
         try (PreparedStatement ps = conexion.buscarConexion().prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {

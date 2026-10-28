@@ -23,7 +23,7 @@ public class MenuPrincipal extends javax.swing.JFrame {
     private VistaClases vistaClases;
     private VistaPases vistaPases;
 
-    private static final java.awt.Dimension TAMANIO_VENTANA = new java.awt.Dimension(700, 400);
+    private static final java.awt.Dimension TAMANIO_VENTANA = new java.awt.Dimension(900, 400);
             
     public MenuPrincipal() {
         initComponents();
@@ -168,6 +168,11 @@ public class MenuPrincipal extends javax.swing.JFrame {
         menuOpciones.setText("Opciones");
 
         salir.setText("Salir");
+        salir.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                salirActionPerformed(evt);
+            }
+        });
         menuOpciones.add(salir);
 
         menuBar.add(menuOpciones);
@@ -215,6 +220,11 @@ public class MenuPrincipal extends javax.swing.JFrame {
         }
         mostrar(vistaPases);
     }//GEN-LAST:event_gestionPasesActionPerformed
+
+    private void salirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_salirActionPerformed
+        con.cerrarConexion();
+        System.exit(0);
+    }//GEN-LAST:event_salirActionPerformed
 
     /**
      * @param args the command line arguments
