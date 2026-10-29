@@ -53,7 +53,6 @@ public class VistaClases extends javax.swing.JInternalFrame {
         modeloTabla.addColumn("Entrenador");
         modeloTabla.addColumn("Horario");
         modeloTabla.addColumn("Capacidad");
-        modeloTabla.addColumn("Disponibles");
         modeloTabla.addColumn("Estado");
         tablaClases.setModel(modeloTabla);
 
@@ -63,8 +62,7 @@ public class VistaClases extends javax.swing.JInternalFrame {
         tablaClases.getColumnModel().getColumn(2).setPreferredWidth(170);
         tablaClases.getColumnModel().getColumn(3).setPreferredWidth(75);
         tablaClases.getColumnModel().getColumn(4).setPreferredWidth(80);
-        tablaClases.getColumnModel().getColumn(5).setPreferredWidth(85);
-        tablaClases.getColumnModel().getColumn(6).setPreferredWidth(75);
+        tablaClases.getColumnModel().getColumn(5).setPreferredWidth(75);
     }
 
     private void cargarEntrenadores() {
@@ -142,7 +140,7 @@ public class VistaClases extends javax.swing.JInternalFrame {
         }
     }
 
-    private void llenarTabla(List<ClaseGym> clases) throws SQLException {
+    private void llenarTabla(List<ClaseGym> clases) {
         modeloTabla.setRowCount(0);
 
         for (ClaseGym c : clases) {
@@ -156,16 +154,12 @@ public class VistaClases extends javax.swing.JInternalFrame {
                 horario = c.getHorario().format(HORA);
             }
 
-            int inscriptos = claseGymData.contarSociosInscriptos(c.getIdClase());
-            int disponibles = c.getCapacidad() - inscriptos;
-
             modeloTabla.addRow(new Object[]{
                 c.getIdClase(),
                 c.getDisciplina(),
                 entrenador,
                 horario,
                 c.getCapacidad(),
-                disponibles,
                 c.isEstado() ? "Activo" : "Inactivo"
             });
         }
@@ -200,7 +194,7 @@ public class VistaClases extends javax.swing.JInternalFrame {
         btnBuscar.setEnabled(!editando);
     }
 
-    private List<ClaseGym> filtrar(List<ClaseGym> clases) throws SQLException {
+    private List<ClaseGym> filtrar(List<ClaseGym> clases) {
         String disciplina = txtDisciplinaBuscar.getText().trim();
         String horarioTexto = txtHorarioBuscar.getText().trim();
         Entrenador entrenador = (Entrenador) cboEntrenadorBuscar.getSelectedItem();
@@ -241,15 +235,6 @@ public class VistaClases extends javax.swing.JInternalFrame {
                 continue;
             }
             if (radioInactivos.isSelected() && c.isEstado()) {
-                continue;
-            }
-
-            int inscriptos = claseGymData.contarSociosInscriptos(c.getIdClase());
-            int disponibles = c.getCapacidad() - inscriptos;
-            if (radioActivos1.isSelected() && disponibles <= 0) {
-                continue;
-            }
-            if (radioInactivos1.isSelected() && disponibles > 0) {
                 continue;
             }
 
@@ -654,9 +639,6 @@ public class VistaClases extends javax.swing.JInternalFrame {
                 claseGymData.guardarClaseGym(clase);
                 JOptionPane.showMessageDialog(this, "Clase guardada con ID " + clase.getIdClase() + ".");
             } else {
-                if (!capacidadAlcanza(clase)) {
-                    return;
-                }
                 claseGymData.actualizarClaseGym(clase);
                 claseGymData.cambiarActivo(clase.getIdClase(), clase.isEstado());
                 JOptionPane.showMessageDialog(this, "Clase actualizada.");
@@ -670,32 +652,12 @@ public class VistaClases extends javax.swing.JInternalFrame {
         }
     }//GEN-LAST:event_btnGuardarActionPerformed
 
-    private boolean capacidadAlcanza(ClaseGym clase) throws SQLException {
-        ClaseGym actual = claseGymData.obtenerClaseGym(clase.getIdClase());
-        if (actual == null) {
-            JOptionPane.showMessageDialog(this, "No hay una clase con el ID " + clase.getIdClase() + ".");
-            return false;
-        }
-        if (actual.getCapacidad() == clase.getCapacidad()) {
-            return true;
-        }
-
-        int inscriptos = claseGymData.contarSociosInscriptos(clase.getIdClase());
-        if (inscriptos > clase.getCapacidad()) {
-            JOptionPane.showMessageDialog(this, "No se puede guardar. Hay " + inscriptos
-                    + " socios inscriptos y la capacidad nueva es " + clase.getCapacidad() + ".");
-            return false;
-        }
-        return true;
-    }
-
     private void btnBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarActionPerformed
         String disciplina = txtDisciplinaBuscar.getText().trim();
         String horarioTexto = txtHorarioBuscar.getText().trim();
         boolean hayFiltro = !disciplina.isEmpty() || !horarioTexto.isEmpty()
                 || cboEntrenadorBuscar.getSelectedItem() != null
-                || radioActivos.isSelected() || radioInactivos.isSelected()
-                || radioActivos1.isSelected() || radioInactivos1.isSelected();
+                || radioActivos.isSelected() || radioInactivos.isSelected();
 
         try {
             List<ClaseGym> filtradas = filtrar(claseGymData.listarClasesGym());
