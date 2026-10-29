@@ -25,6 +25,7 @@ public class ClaseGymData {
     }
 
     public int guardarClaseGym(ClaseGym clase) throws SQLException {
+        validarHorarioEntrenador(clase);
         String sql = "INSERT INTO clasegym(disciplina, id_entrenador, horario, capacidad, estado) VALUES (?,?,?,?,?)";
         try (PreparedStatement ps = conexion.buscarConexion().prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, clase.getDisciplina());
@@ -68,6 +69,7 @@ public class ClaseGymData {
     }
 
     public void actualizarClaseGym(ClaseGym clase) throws SQLException {
+        validarHorarioEntrenador(clase);
         String sql = "UPDATE clasegym SET disciplina = ?, id_entrenador = ?, horario = ?, capacidad = ? WHERE id_clase = ?";
 
         try (PreparedStatement ps = conexion.buscarConexion().prepareStatement(sql)) {
@@ -180,6 +182,36 @@ public class ClaseGymData {
     private ClaseGym armarClase(ResultSet rs) throws SQLException {
         Entrenador entrenador = entrenadorData.obtenerEntrenador(rs.getInt("id_entrenador"));
         return parsearRS(rs, entrenador);
+    }
+
+    private void validarHorarioEntrenador(ClaseGym clase) throws SQLException {
+        if (!clase.isEstado() || clase.getHorario() == null) {
+            return;
+        }
+
+        int idEntrenador = idEntrenador(clase);
+        for (ClaseGym otra : listarClasesGymPorEntrenador(idEntrenador)) {
+            if (otra.getIdClase() == clase.getIdClase() || !otra.isEstado() || otra.getHorario() == null) {
+                continue;
+            }
+            if (horariosSuperpuestos(clase.getHorario(), otra.getHorario())) {
+                LocalTime fin = otra.getHorario().plusHours(1);
+                throw new SQLException("No se pudo guardar la clase: el entrenador ya dicta otra entre "
+                        + otra.getHorario() + " y " + fin + ".");
+            }
+        }
+    }
+
+    private boolean horariosSuperpuestos(LocalTime inicio, LocalTime otroInicio) {
+        return caeEnLaClase(inicio, otroInicio) || caeEnLaClase(otroInicio, inicio);
+    }
+
+    private boolean caeEnLaClase(LocalTime inicioClase, LocalTime instante) {
+        LocalTime fin = inicioClase.plusHours(1);
+        if (fin.isAfter(inicioClase)) {
+            return !instante.isBefore(inicioClase) && instante.isBefore(fin);
+        }
+        return !instante.isBefore(inicioClase) || instante.isBefore(fin);
     }
 
     private int idEntrenador(ClaseGym clase) throws SQLException {
