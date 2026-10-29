@@ -328,9 +328,6 @@ public class VistaClases extends javax.swing.JInternalFrame {
         radioTodos = new javax.swing.JRadioButton();
         radioActivos = new javax.swing.JRadioButton();
         radioInactivos = new javax.swing.JRadioButton();
-        radioInactivos1 = new javax.swing.JRadioButton();
-        radioActivos1 = new javax.swing.JRadioButton();
-        radioTodos1 = new javax.swing.JRadioButton();
         btnEditar = new javax.swing.JButton();
 
         setClosable(true);
@@ -501,35 +498,21 @@ public class VistaClases extends javax.swing.JInternalFrame {
         buttonGroupActivoFiltro.add(radioInactivos);
         radioInactivos.setText("Inactivas");
 
-        buttonGroupVacantesFiltro.add(radioInactivos1);
-        radioInactivos1.setText("Completos");
-
-        buttonGroupVacantesFiltro.add(radioActivos1);
-        radioActivos1.setText("Con vacantes");
-
-        buttonGroupVacantesFiltro.add(radioTodos1);
-        radioTodos1.setSelected(true);
-        radioTodos1.setText("Todos");
-
         javax.swing.GroupLayout panelBuscarLayout = new javax.swing.GroupLayout(panelBuscar);
         panelBuscar.setLayout(panelBuscarLayout);
         panelBuscarLayout.setHorizontalGroup(
             panelBuscarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelBuscarLayout.createSequentialGroup()
-                .addContainerGap(361, Short.MAX_VALUE)
-                .addGroup(panelBuscarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(btnBuscar, javax.swing.GroupLayout.PREFERRED_SIZE, 116, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(315, Short.MAX_VALUE)
+                .addGroup(panelBuscarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(panelBuscarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(radioTodos, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(radioActivos)
+                        .addComponent(radioInactivos))
                     .addGroup(panelBuscarLayout.createSequentialGroup()
-                        .addGroup(panelBuscarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(radioTodos, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(radioActivos)
-                            .addComponent(radioInactivos))
-                        .addGap(37, 37, 37)
-                        .addGroup(panelBuscarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(radioTodos1, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(radioActivos1)
-                            .addComponent(radioInactivos1))))
-                .addGap(21, 21, 21))
+                        .addComponent(btnBuscar, javax.swing.GroupLayout.PREFERRED_SIZE, 116, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(2, 2, 2)))
+                .addContainerGap())
             .addGroup(panelBuscarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(panelBuscarLayout.createSequentialGroup()
                     .addContainerGap()
@@ -542,25 +525,17 @@ public class VistaClases extends javax.swing.JInternalFrame {
                         .addComponent(cboEntrenadorBuscar, 0, 260, Short.MAX_VALUE)
                         .addComponent(txtHorarioBuscar, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(txtDisciplinaBuscar))
-                    .addContainerGap(203, Short.MAX_VALUE)))
+                    .addContainerGap(109, Short.MAX_VALUE)))
         );
         panelBuscarLayout.setVerticalGroup(
             panelBuscarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelBuscarLayout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(panelBuscarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelBuscarLayout.createSequentialGroup()
-                        .addComponent(radioTodos)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(radioActivos)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(radioInactivos))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelBuscarLayout.createSequentialGroup()
-                        .addComponent(radioTodos1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(radioActivos1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(radioInactivos1)))
+                .addComponent(radioTodos)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(radioActivos)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(radioInactivos)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(btnBuscar)
                 .addContainerGap())
@@ -748,11 +723,8 @@ public class VistaClases extends javax.swing.JInternalFrame {
     private javax.swing.JPanel panelBuscar;
     private javax.swing.JPanel panelDetalle;
     private javax.swing.JRadioButton radioActivos;
-    private javax.swing.JRadioButton radioActivos1;
     private javax.swing.JRadioButton radioInactivos;
-    private javax.swing.JRadioButton radioInactivos1;
     private javax.swing.JRadioButton radioTodos;
-    private javax.swing.JRadioButton radioTodos1;
     private javax.swing.JTable tablaClases;
     private javax.swing.JTextField txtCapacidad;
     private javax.swing.JTextField txtDisciplina;

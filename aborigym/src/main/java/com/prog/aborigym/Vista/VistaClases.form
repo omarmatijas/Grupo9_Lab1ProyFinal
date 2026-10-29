@@ -297,24 +297,19 @@
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="1" attributes="0">
-                  <EmptySpace pref="361" max="32767" attributes="0"/>
-                  <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="btnBuscar" min="-2" pref="116" max="-2" attributes="0"/>
-                      <Group type="102" attributes="0">
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="radioTodos" alignment="0" min="-2" pref="70" max="-2" attributes="0"/>
-                              <Component id="radioActivos" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Component id="radioInactivos" alignment="0" min="-2" max="-2" attributes="0"/>
-                          </Group>
-                          <EmptySpace min="-2" pref="37" max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="radioTodos1" alignment="0" min="-2" pref="70" max="-2" attributes="0"/>
-                              <Component id="radioActivos1" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Component id="radioInactivos1" alignment="0" min="-2" max="-2" attributes="0"/>
-                          </Group>
+                  <EmptySpace pref="315" max="32767" attributes="0"/>
+                  <Group type="103" groupAlignment="1" attributes="0">
+                      <Group type="103" alignment="1" groupAlignment="0" attributes="0">
+                          <Component id="radioTodos" alignment="0" min="-2" pref="70" max="-2" attributes="0"/>
+                          <Component id="radioActivos" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="radioInactivos" alignment="0" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <Group type="102" alignment="1" attributes="0">
+                          <Component id="btnBuscar" min="-2" pref="116" max="-2" attributes="0"/>
+                          <EmptySpace min="-2" pref="2" max="-2" attributes="0"/>
                       </Group>
                   </Group>
-                  <EmptySpace min="-2" pref="21" max="-2" attributes="0"/>
+                  <EmptySpace min="-2" max="-2" attributes="0"/>
               </Group>
               <Group type="103" rootIndex="1" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="0" attributes="0">
@@ -330,7 +325,7 @@
                           <Component id="txtHorarioBuscar" alignment="0" min="-2" pref="180" max="-2" attributes="0"/>
                           <Component id="txtDisciplinaBuscar" alignment="0" max="32767" attributes="0"/>
                       </Group>
-                      <EmptySpace pref="203" max="32767" attributes="0"/>
+                      <EmptySpace pref="109" max="32767" attributes="0"/>
                   </Group>
               </Group>
           </Group>
@@ -339,22 +334,11 @@
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="1" attributes="0">
                   <EmptySpace max="32767" attributes="0"/>
-                  <Group type="103" groupAlignment="0" attributes="0">
-                      <Group type="102" alignment="1" attributes="0">
-                          <Component id="radioTodos" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Component id="radioActivos" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Component id="radioInactivos" min="-2" max="-2" attributes="0"/>
-                      </Group>
-                      <Group type="102" alignment="1" attributes="0">
-                          <Component id="radioTodos1" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Component id="radioActivos1" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Component id="radioInactivos1" min="-2" max="-2" attributes="0"/>
-                      </Group>
-                  </Group>
+                  <Component id="radioTodos" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="radioActivos" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="radioInactivos" min="-2" max="-2" attributes="0"/>
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                   <Component id="btnBuscar" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
@@ -452,31 +436,6 @@
               <ComponentRef name="buttonGroupActivoFiltro"/>
             </Property>
             <Property name="text" type="java.lang.String" value="Inactivas"/>
-          </Properties>
-        </Component>
-        <Component class="javax.swing.JRadioButton" name="radioInactivos1">
-          <Properties>
-            <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
-              <ComponentRef name="buttonGroupVacantesFiltro"/>
-            </Property>
-            <Property name="text" type="java.lang.String" value="Completos"/>
-          </Properties>
-        </Component>
-        <Component class="javax.swing.JRadioButton" name="radioActivos1">
-          <Properties>
-            <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
-              <ComponentRef name="buttonGroupVacantesFiltro"/>
-            </Property>
-            <Property name="text" type="java.lang.String" value="Con vacantes"/>
-          </Properties>
-        </Component>
-        <Component class="javax.swing.JRadioButton" name="radioTodos1">
-          <Properties>
-            <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
-              <ComponentRef name="buttonGroupVacantesFiltro"/>
-            </Property>
-            <Property name="selected" type="boolean" value="true"/>
-            <Property name="text" type="java.lang.String" value="Todos"/>
           </Properties>
         </Component>
       </SubComponents>
