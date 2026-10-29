@@ -22,25 +22,6 @@ public class VistaEntrenador extends javax.swing.JFrame {
         initComponents();
     }
 
-    public void borrarEntrenador(int idEntrenador) throws SQLException {
-        String sql = "DELETE FROM entrenador WHERE id_entrenador = ?";
-        try (PreparedStatement ps = conexion.buscarConexion().prepareStatement(sql)) {
-            ps.setInt(1, idEntrenador);
-            int filas;
-            try {
-                filas = ps.executeUpdate();
-            } catch (SQLException ex) {
-                if (Conexion.SQLSTATE_VIOLACION_INTEGRIDAD.equals(ex.getSQLState())) {
-                    throw new SQLException("No se puede eliminar el entrenador: tiene clases asignadas. Use la baja lógica.", ex);
-                }
-                throw new SQLException("No se pudo eliminar el entrenador.", ex);
-            }
-            if (filas != 1) {
-                throw new SQLException("No se pudo eliminar el entrenador, el ID " + idEntrenador + " no existe.");
-            }
-        }
-    }
-
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
