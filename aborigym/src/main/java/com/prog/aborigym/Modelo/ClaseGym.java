@@ -1,5 +1,6 @@
 package com.prog.aborigym.Modelo;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
 
 /**
@@ -79,6 +80,17 @@ public class ClaseGym {
 
     public void setEstado(boolean estado) {
         this.estado = estado;
+    }
+
+    public Asistencia marcarAsistencia(Socio socio, LocalDate fecha, int asistenciasTomadas, Pase pase) {
+        if (pase == null || pase.getCantidadEntradas() <= 0) {
+            return null;
+        }
+        if (asistenciasTomadas >= capacidad) {
+            return null;
+        }
+        pase.registrarAsistencia();
+        return new Asistencia(socio, this, pase, fecha);
     }
 
     @Override

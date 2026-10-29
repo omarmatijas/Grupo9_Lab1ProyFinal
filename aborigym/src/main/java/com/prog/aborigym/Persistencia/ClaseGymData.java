@@ -111,17 +111,17 @@ public class ClaseGymData {
     }
 
     public List<ClaseGym> listarClasesGym() throws SQLException {
-        String sql = "SELECT * FROM clasegym";
+        String sql = "SELECT * FROM clasegym ORDER BY horario, disciplina";
         return listar(sql, null);
     }
 
     public List<ClaseGym> listarClasesGymPorDisciplina(String disciplina) throws SQLException {
-        String sql = "SELECT * FROM clasegym WHERE disciplina = ?";
+        String sql = "SELECT * FROM clasegym WHERE disciplina = ? ORDER BY horario, disciplina";
         return listar(sql, disciplina);
     }
 
     public List<ClaseGym> listarClasesGymPorEntrenador(int idEntrenador) throws SQLException {
-        String sql = "SELECT * FROM clasegym WHERE id_entrenador = ?";
+        String sql = "SELECT * FROM clasegym WHERE id_entrenador = ? ORDER BY horario, disciplina";
         List<ClaseGym> lista = new ArrayList<>();
 
         try (PreparedStatement ps = conexion.buscarConexion().prepareStatement(sql)) {

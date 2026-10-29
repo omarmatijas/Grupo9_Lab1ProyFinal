@@ -188,9 +188,6 @@ public class VistaClases extends javax.swing.JInternalFrame {
         radioTodos.setEnabled(!editando);
         radioActivos.setEnabled(!editando);
         radioInactivos.setEnabled(!editando);
-        radioTodos1.setEnabled(!editando);
-        radioActivos1.setEnabled(!editando);
-        radioInactivos1.setEnabled(!editando);
         btnBuscar.setEnabled(!editando);
     }
 

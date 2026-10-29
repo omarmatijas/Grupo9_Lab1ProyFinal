@@ -22,6 +22,7 @@ public class MenuPrincipal extends javax.swing.JFrame {
     private VistaEntrenadores vistaEntrenadores;
     private VistaClases vistaClases;
     private VistaPases vistaPases;
+    private MarcarAsistencia vistaMarcarAsistencia;
 
     private static final java.awt.Dimension TAMANIO_VENTANA = new java.awt.Dimension(980, 500);
             
@@ -100,6 +101,7 @@ public class MenuPrincipal extends javax.swing.JFrame {
         gestionClases = new javax.swing.JMenuItem();
         menuPases = new javax.swing.JMenu();
         gestionPases = new javax.swing.JMenuItem();
+        marcarAsistencia = new javax.swing.JMenuItem();
         menuOpciones = new javax.swing.JMenu();
         salir = new javax.swing.JMenuItem();
 
@@ -162,6 +164,14 @@ public class MenuPrincipal extends javax.swing.JFrame {
             }
         });
         menuPases.add(gestionPases);
+
+        marcarAsistencia.setText("Marcar asistencia");
+        marcarAsistencia.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                marcarAsistenciaActionPerformed(evt);
+            }
+        });
+        menuPases.add(marcarAsistencia);
 
         menuBar.add(menuPases);
 
@@ -226,6 +236,13 @@ public class MenuPrincipal extends javax.swing.JFrame {
         System.exit(0);
     }//GEN-LAST:event_salirActionPerformed
 
+    private void marcarAsistenciaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_marcarAsistenciaActionPerformed
+        if (vistaMarcarAsistencia == null || vistaMarcarAsistencia.isClosed()) {
+            vistaMarcarAsistencia = new MarcarAsistencia(con);
+        }
+        mostrar(vistaMarcarAsistencia);
+    }//GEN-LAST:event_marcarAsistenciaActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -267,6 +284,7 @@ public class MenuPrincipal extends javax.swing.JFrame {
     private javax.swing.JMenuItem gestionEntrenadores;
     private javax.swing.JMenuItem gestionPases;
     private javax.swing.JMenuItem gestionSocios;
+    private javax.swing.JMenuItem marcarAsistencia;
     private javax.swing.JMenuBar menuBar;
     private javax.swing.JMenu menuClases;
     private javax.swing.JMenu menuEntrenadores;
