@@ -166,6 +166,21 @@ public class ClaseGymData {
         }
     }
 
+    public int contarSociosInscriptos(int idClase) throws SQLException {
+        String sql = "SELECT COUNT(DISTINCT id_socio) FROM asistencia WHERE id_clase = ?";
+
+        try (PreparedStatement ps = conexion.buscarConexion().prepareStatement(sql)) {
+            ps.setInt(1, idClase);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+                return 0;
+            }
+        }
+    }
+
     public static ClaseGym parsearRS(ResultSet rs, Entrenador entrenador) throws SQLException {
         return new ClaseGym(
                 rs.getInt("id_clase"),

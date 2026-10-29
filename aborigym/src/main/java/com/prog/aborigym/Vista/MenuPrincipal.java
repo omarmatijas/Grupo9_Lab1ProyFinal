@@ -23,7 +23,7 @@ public class MenuPrincipal extends javax.swing.JFrame {
     private VistaClases vistaClases;
     private VistaPases vistaPases;
 
-    private static final java.awt.Dimension TAMANIO_VENTANA = new java.awt.Dimension(900, 400);
+    private static final java.awt.Dimension TAMANIO_VENTANA = new java.awt.Dimension(980, 500);
             
     public MenuPrincipal() {
         initComponents();
@@ -61,7 +61,7 @@ public class MenuPrincipal extends javax.swing.JFrame {
             ventana.setResizable(false);
             escritorio.add(ventana);
             
-            centrar(ventana);    
+            ubicar(ventana,false);    
         }
         
         ventana.setVisible(true);
@@ -74,9 +74,9 @@ public class MenuPrincipal extends javax.swing.JFrame {
         }
     }
     
-    private void centrar(javax.swing.JInternalFrame ventana) {
-        int x = (escritorio.getWidth() - ventana.getWidth()) / 2;
-        int y = (escritorio.getHeight()- ventana.getHeight()) / 2;
+    private void ubicar(javax.swing.JInternalFrame ventana, boolean centro) {
+        int x = centro ? (escritorio.getWidth() - ventana.getWidth()) / 2 : 0;
+        int y = centro ? (escritorio.getHeight()- ventana.getHeight()) / 2 : 0;
         
         ventana.setLocation(Math.max(x, 0), Math.max(y, 0));
     }
