@@ -17,6 +17,14 @@
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="gestionSociosActionPerformed"/>
               </Events>
             </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="gestionPases">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Gesti&#xf3;n de pases"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="gestionPasesActionPerformed"/>
+              </Events>
+            </MenuItem>
           </SubComponents>
         </Menu>
         <Menu class="javax.swing.JMenu" name="menuEntrenadores">
@@ -49,22 +57,14 @@
             </MenuItem>
           </SubComponents>
         </Menu>
-        <Menu class="javax.swing.JMenu" name="menuPases">
+        <Menu class="javax.swing.JMenu" name="menuAsistencia">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Pases"/>
+            <Property name="text" type="java.lang.String" value="Asistencia"/>
           </Properties>
           <SubComponents>
-            <MenuItem class="javax.swing.JMenuItem" name="gestionPases">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="Gesti&#xf3;n de pases"/>
-              </Properties>
-              <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="gestionPasesActionPerformed"/>
-              </Events>
-            </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="marcarAsistencia">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Marcar asistencia"/>
+                <Property name="text" type="java.lang.String" value="Actualizar asistencia a clase"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="marcarAsistenciaActionPerformed"/>

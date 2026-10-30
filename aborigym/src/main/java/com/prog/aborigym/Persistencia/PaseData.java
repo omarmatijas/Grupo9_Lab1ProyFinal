@@ -21,6 +21,22 @@ public class PaseData {
         this.socioData = new SocioData(conexion);
     }
 
+    public Pase obtenerPase(int idPase) throws SQLException {
+        String sql = "SELECT * FROM pase WHERE id_pase = ?";
+
+        try (PreparedStatement ps = conexion.buscarConexion().prepareStatement(sql)) {
+            ps.setInt(1, idPase);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    Socio socio = socioData.obtenerSocio(rs.getInt("id_socio"));
+                    return parsearRS(rs, socio);
+                }
+                return null;
+            }
+        }
+    }
+
     public Pase obtenerPaseActivoConEntradas(int idSocio, LocalDate fecha) throws SQLException {
         String sql = "SELECT * FROM pase WHERE id_socio = ? AND estado = ? AND cantidad_entradas > 0 "
                 + "AND fecha_inicio <= ? AND fecha_fin >= ? ORDER BY fecha_fin LIMIT 1";

@@ -9,15 +9,15 @@ import javax.swing.JOptionPane;
  * @author Grupo9
  */
 public class MenuPrincipal extends javax.swing.JFrame {
-    
+
     private static final String HOST = "localhost";
     private static final String PORT = "3306";
     private static final String DB_NAME = "grupo9_aborigym";
     private static final String USER = "root";
     private static final String PASSWORD = "";
-    
+
     private Conexion con;
-    
+
     private VistaSocios vistaSocios;
     private VistaEntrenadores vistaEntrenadores;
     private VistaClases vistaClases;
@@ -25,16 +25,16 @@ public class MenuPrincipal extends javax.swing.JFrame {
     private MarcarAsistencia vistaMarcarAsistencia;
 
     private static final java.awt.Dimension TAMANIO_VENTANA = new java.awt.Dimension(980, 500);
-            
+
     public MenuPrincipal() {
         initComponents();
         setSize(1000, 650);
         setLocationRelativeTo(null);
         setResizable(false);
-        
+
         try {
             iniciarConexion();
-        } catch(SQLException ex) {
+        } catch (SQLException ex) {
             JOptionPane.showMessageDialog(this, "Verifique XAMPP\n" + ex.getMessage(),
                     "Error de Conexión", JOptionPane.ERROR_MESSAGE);
             System.exit(1);
@@ -52,36 +52,36 @@ public class MenuPrincipal extends javax.swing.JFrame {
             throw new SQLException("No se pudo conectar a " + url);
         }
     }
-    
+
     private void mostrar(javax.swing.JInternalFrame ventana) {
         if (ventana.getParent() == null) {
             ventana.setSize(TAMANIO_VENTANA);
             ventana.setClosable(true);
             ventana.setIconifiable(true);
-            ventana.setMaximizable(false);
-            ventana.setResizable(false);
+            ventana.setMaximizable(true);
+            ventana.setResizable(true);
             escritorio.add(ventana);
-            
-            ubicar(ventana,false);    
+
+            ubicar(ventana, false);
         }
-        
+
         ventana.setVisible(true);
         ventana.toFront();
-        
+
         try {
             ventana.setSelected(true);
         } catch (java.beans.PropertyVetoException ex) {
-            
+
         }
     }
-    
+
     private void ubicar(javax.swing.JInternalFrame ventana, boolean centro) {
         int x = centro ? (escritorio.getWidth() - ventana.getWidth()) / 2 : 0;
-        int y = centro ? (escritorio.getHeight()- ventana.getHeight()) / 2 : 0;
-        
+        int y = centro ? (escritorio.getHeight() - ventana.getHeight()) / 2 : 0;
+
         ventana.setLocation(Math.max(x, 0), Math.max(y, 0));
     }
-    
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -95,12 +95,12 @@ public class MenuPrincipal extends javax.swing.JFrame {
         menuBar = new javax.swing.JMenuBar();
         menuSocios = new javax.swing.JMenu();
         gestionSocios = new javax.swing.JMenuItem();
+        gestionPases = new javax.swing.JMenuItem();
         menuEntrenadores = new javax.swing.JMenu();
         gestionEntrenadores = new javax.swing.JMenuItem();
         menuClases = new javax.swing.JMenu();
         gestionClases = new javax.swing.JMenuItem();
-        menuPases = new javax.swing.JMenu();
-        gestionPases = new javax.swing.JMenuItem();
+        menuAsistencia = new javax.swing.JMenu();
         marcarAsistencia = new javax.swing.JMenuItem();
         menuOpciones = new javax.swing.JMenu();
         salir = new javax.swing.JMenuItem();
@@ -129,6 +129,14 @@ public class MenuPrincipal extends javax.swing.JFrame {
         });
         menuSocios.add(gestionSocios);
 
+        gestionPases.setText("Gestión de pases");
+        gestionPases.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                gestionPasesActionPerformed(evt);
+            }
+        });
+        menuSocios.add(gestionPases);
+
         menuBar.add(menuSocios);
 
         menuEntrenadores.setText("Entrenadores");
@@ -155,25 +163,17 @@ public class MenuPrincipal extends javax.swing.JFrame {
 
         menuBar.add(menuClases);
 
-        menuPases.setText("Pases");
+        menuAsistencia.setText("Asistencia");
 
-        gestionPases.setText("Gestión de pases");
-        gestionPases.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                gestionPasesActionPerformed(evt);
-            }
-        });
-        menuPases.add(gestionPases);
-
-        marcarAsistencia.setText("Marcar asistencia");
+        marcarAsistencia.setText("Actualizar asistencia a clase");
         marcarAsistencia.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 marcarAsistenciaActionPerformed(evt);
             }
         });
-        menuPases.add(marcarAsistencia);
+        menuAsistencia.add(marcarAsistencia);
 
-        menuBar.add(menuPases);
+        menuBar.add(menuAsistencia);
 
         menuOpciones.setText("Opciones");
 
@@ -204,28 +204,28 @@ public class MenuPrincipal extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void gestionSociosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_gestionSociosActionPerformed
-        if (vistaSocios  == null || vistaSocios.isClosed()) {
+        if (vistaSocios == null || vistaSocios.isClosed()) {
             vistaSocios = new VistaSocios(con);
         }
         mostrar(vistaSocios);
     }//GEN-LAST:event_gestionSociosActionPerformed
 
     private void gestionClasesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_gestionClasesActionPerformed
-        if (vistaClases  == null || vistaClases.isClosed()) {
+        if (vistaClases == null || vistaClases.isClosed()) {
             vistaClases = new VistaClases(con);
         }
         mostrar(vistaClases);
     }//GEN-LAST:event_gestionClasesActionPerformed
 
     private void gestionEntrenadoresActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_gestionEntrenadoresActionPerformed
-        if (vistaEntrenadores  == null || vistaEntrenadores.isClosed()) {
+        if (vistaEntrenadores == null || vistaEntrenadores.isClosed()) {
             vistaEntrenadores = new VistaEntrenadores(con);
         }
         mostrar(vistaEntrenadores);
     }//GEN-LAST:event_gestionEntrenadoresActionPerformed
 
     private void gestionPasesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_gestionPasesActionPerformed
-        if (vistaPases  == null || vistaPases.isClosed()) {
+        if (vistaPases == null || vistaPases.isClosed()) {
             vistaPases = new VistaPases(con);
         }
         mostrar(vistaPases);
@@ -285,11 +285,11 @@ public class MenuPrincipal extends javax.swing.JFrame {
     private javax.swing.JMenuItem gestionPases;
     private javax.swing.JMenuItem gestionSocios;
     private javax.swing.JMenuItem marcarAsistencia;
+    private javax.swing.JMenu menuAsistencia;
     private javax.swing.JMenuBar menuBar;
     private javax.swing.JMenu menuClases;
     private javax.swing.JMenu menuEntrenadores;
     private javax.swing.JMenu menuOpciones;
-    private javax.swing.JMenu menuPases;
     private javax.swing.JMenu menuSocios;
     private javax.swing.JMenuItem salir;
     // End of variables declaration//GEN-END:variables

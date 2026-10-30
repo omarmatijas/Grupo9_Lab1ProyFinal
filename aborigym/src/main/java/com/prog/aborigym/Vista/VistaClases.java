@@ -7,9 +7,7 @@ import com.prog.aborigym.Persistencia.Conexion;
 import com.prog.aborigym.Persistencia.EntrenadorData;
 import java.sql.SQLException;
 import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
 import java.util.List;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JList;
@@ -21,8 +19,6 @@ import javax.swing.table.DefaultTableModel;
  * @author Grupo9
  */
 public class VistaClases extends javax.swing.JInternalFrame {
-
-    private static final DateTimeFormatter HORA = DateTimeFormatter.ofPattern("HH:mm");
 
     private ClaseGymData claseGymData;
     private EntrenadorData entrenadorData;
@@ -98,7 +94,7 @@ public class VistaClases extends javax.swing.JInternalFrame {
         txtDisciplina.setText(c.getDisciplina());
         seleccionarEntrenador(c.getEntrenador());
         if (c.getHorario() != null) {
-            txtHorario.setText(c.getHorario().format(HORA));
+            txtHorario.setText(c.getHorario().format(FiltroClases.HORA));
         } else {
             txtHorario.setText("");
         }
@@ -141,6 +137,7 @@ public class VistaClases extends javax.swing.JInternalFrame {
     }
 
     private void llenarTabla(List<ClaseGym> clases) {
+        FiltroClases.ordenar(clases);
         modeloTabla.setRowCount(0);
 
         for (ClaseGym c : clases) {
@@ -151,7 +148,7 @@ public class VistaClases extends javax.swing.JInternalFrame {
 
             String horario = "";
             if (c.getHorario() != null) {
-                horario = c.getHorario().format(HORA);
+                horario = c.getHorario().format(FiltroClases.HORA);
             }
 
             modeloTabla.addRow(new Object[]{
@@ -192,52 +189,22 @@ public class VistaClases extends javax.swing.JInternalFrame {
     }
 
     private List<ClaseGym> filtrar(List<ClaseGym> clases) {
-        String disciplina = txtDisciplinaBuscar.getText().trim();
-        String horarioTexto = txtHorarioBuscar.getText().trim();
-        Entrenador entrenador = (Entrenador) cboEntrenadorBuscar.getSelectedItem();
-
-        LocalTime horario = null;
-        if (!horarioTexto.isEmpty()) {
-            try {
-                horario = LocalTime.parse(horarioTexto, HORA);
-            } catch (DateTimeParseException ex) {
-                JOptionPane.showMessageDialog(this, "El horario de búsqueda debe tener el formato HH:mm, por ejemplo 18:30.");
-                return null;
-            }
+        LocalTime horario;
+        try {
+            horario = FiltroClases.leerHorario(txtHorarioBuscar.getText());
+        } catch (DateTimeParseException ex) {
+            JOptionPane.showMessageDialog(this, FiltroClases.MENSAJE_HORARIO);
+            return null;
         }
 
-        List<ClaseGym> filtradas = new ArrayList<>();
-        for (ClaseGym c : clases) {
-            if (!disciplina.isEmpty()) {
-                String disciplinaClase = c.getDisciplina() == null ? "" : c.getDisciplina();
-                if (!disciplinaClase.toLowerCase().contains(disciplina.toLowerCase())) {
-                    continue;
-                }
-            }
-
-            if (entrenador != null) {
-                if (c.getEntrenador() == null || c.getEntrenador().getIdEntrenador() != entrenador.getIdEntrenador()) {
-                    continue;
-                }
-            }
-
-            if (horario != null) {
-                LocalTime horarioClase = c.getHorario();
-                if (horarioClase == null || horarioClase.getHour() != horario.getHour() || horarioClase.getMinute() != horario.getMinute()) {
-                    continue;
-                }
-            }
-
-            if (radioActivos.isSelected() && !c.isEstado()) {
-                continue;
-            }
-            if (radioInactivos.isSelected() && c.isEstado()) {
-                continue;
-            }
-
-            filtradas.add(c);
-        }
-        return filtradas;
+        return FiltroClases.filtrar(
+                clases,
+                txtDisciplinaBuscar.getText(),
+                (Entrenador) cboEntrenadorBuscar.getSelectedItem(),
+                horario,
+                radioActivos.isSelected(),
+                radioInactivos.isSelected()
+        );
     }
 
     private ClaseGym leerFormulario() {
@@ -259,7 +226,7 @@ public class VistaClases extends javax.swing.JInternalFrame {
 
         LocalTime horario;
         try {
-            horario = LocalTime.parse(txtHorario.getText().trim(), HORA);
+            horario = LocalTime.parse(txtHorario.getText().trim(), FiltroClases.HORA);
         } catch (DateTimeParseException ex) {
             JOptionPane.showMessageDialog(this, "El horario debe tener el formato HH:mm, por ejemplo 18:30.");
             return null;

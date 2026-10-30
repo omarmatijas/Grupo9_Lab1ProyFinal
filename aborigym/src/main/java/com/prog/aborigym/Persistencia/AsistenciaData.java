@@ -1,11 +1,17 @@
 package com.prog.aborigym.Persistencia;
 
 import com.prog.aborigym.Modelo.Asistencia;
+import com.prog.aborigym.Modelo.Entrenador;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -62,6 +68,66 @@ public class AsistenciaData {
         }
     }
 
+    public Map<Integer, Integer> contarAsistenciaClases(LocalDate fecha, String disciplina, Entrenador entrenador,
+            LocalTime horario, boolean soloActivas, boolean soloInactivas) throws SQLException {
+        String sql = "SELECT c.id_clase, COUNT(a.id_asistencia) AS cantidad "
+                + "FROM clasegym c LEFT JOIN asistencia a ON a.id_clase = c.id_clase AND a.fecha_asistencia = ?";
+        String texto = disciplina == null ? "" : disciplina.trim();
+        String where = "";
+
+        if (!texto.isEmpty()) {
+            where = where + " AND c.disciplina LIKE ?";
+        }
+        if (entrenador != null) {
+            where = where + " AND c.id_entrenador = ?";
+        }
+        if (horario != null) {
+            where = where + " AND HOUR(c.horario) = ? AND MINUTE(c.horario) = ?";
+        }
+        if (soloActivas) {
+            where = where + " AND c.estado = ?";
+        } else if (soloInactivas) {
+            where = where + " AND c.estado = ?";
+        }
+        if (!where.isEmpty()) {
+            sql = sql + " WHERE" + where.substring(4);
+        }
+        sql = sql + " GROUP BY c.id_clase";
+
+        Map<Integer, Integer> cantidades = new HashMap<>();
+        try (PreparedStatement ps = conexion.buscarConexion().prepareStatement(sql)) {
+            int indice = 1;
+            ps.setObject(indice, fecha);
+            indice++;
+            if (!texto.isEmpty()) {
+                ps.setString(indice, "%" + texto + "%");
+                indice++;
+            }
+            if (entrenador != null) {
+                ps.setInt(indice, entrenador.getIdEntrenador());
+                indice++;
+            }
+            if (horario != null) {
+                ps.setInt(indice, horario.getHour());
+                indice++;
+                ps.setInt(indice, horario.getMinute());
+                indice++;
+            }
+            if (soloActivas) {
+                ps.setBoolean(indice, true);
+            } else if (soloInactivas) {
+                ps.setBoolean(indice, false);
+            }
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    cantidades.put(rs.getInt("id_clase"), rs.getInt("cantidad"));
+                }
+            }
+        }
+        return cantidades;
+    }
+
     public int contarAsistencias(int idClase, LocalDate fecha) throws SQLException {
         String sql = "SELECT COUNT(*) FROM asistencia WHERE id_clase = ? AND fecha_asistencia = ?";
 
@@ -74,6 +140,55 @@ public class AsistenciaData {
                     return rs.getInt(1);
                 }
                 return 0;
+            }
+        }
+    }
+
+    public List<Integer> listarSociosConAsistencia(int idClase, LocalDate fecha) throws SQLException {
+        String sql = "SELECT id_socio FROM asistencia WHERE id_clase = ? AND fecha_asistencia = ?";
+        List<Integer> socios = new ArrayList<>();
+
+        try (PreparedStatement ps = conexion.buscarConexion().prepareStatement(sql)) {
+            ps.setInt(1, idClase);
+            ps.setObject(2, fecha);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    socios.add(rs.getInt("id_socio"));
+                }
+            }
+        }
+        return socios;
+    }
+
+    public int obtenerIdPaseDeAsistencia(int idSocio, int idClase, LocalDate fecha) throws SQLException {
+        String sql = "SELECT id_pase FROM asistencia WHERE id_socio = ? AND id_clase = ? AND fecha_asistencia = ?";
+
+        try (PreparedStatement ps = conexion.buscarConexion().prepareStatement(sql)) {
+            ps.setInt(1, idSocio);
+            ps.setInt(2, idClase);
+            ps.setObject(3, fecha);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("id_pase");
+                }
+                return 0;
+            }
+        }
+    }
+
+    public void eliminarAsistencia(int idSocio, int idClase, LocalDate fecha) throws SQLException {
+        String sql = "DELETE FROM asistencia WHERE id_socio = ? AND id_clase = ? AND fecha_asistencia = ?";
+
+        try (PreparedStatement ps = conexion.buscarConexion().prepareStatement(sql)) {
+            ps.setInt(1, idSocio);
+            ps.setInt(2, idClase);
+            ps.setObject(3, fecha);
+
+            int filas = ps.executeUpdate();
+            if (filas != 1) {
+                throw new SQLException("No se pudo anular la asistencia.");
             }
         }
     }

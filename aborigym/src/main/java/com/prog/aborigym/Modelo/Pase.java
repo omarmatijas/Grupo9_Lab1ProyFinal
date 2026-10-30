@@ -96,6 +96,10 @@ public class Pase {
         this.cantidadEntradas -= 1;
     }
 
+    public void anularAsistencia() {
+        this.cantidadEntradas += 1;
+    }
+
     @Override
     public String toString() {
         return "Pase " + idPase + " - Entradas: " + cantidadEntradas + " (Vence " + fechaFin + ')';
