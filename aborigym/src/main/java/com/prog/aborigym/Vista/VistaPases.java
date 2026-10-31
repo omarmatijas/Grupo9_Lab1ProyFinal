@@ -309,6 +309,35 @@ public class VistaPases extends javax.swing.JInternalFrame {
         return "Activo";
     }
 
+    private boolean confirmarSiSeSuperpone(Pase nuevo) throws SQLException {
+        LocalDate hoy = LocalDate.now();
+        for (Pase existente : paseData.listarPasesPorSocio(nuevo.getSocio().getIdSocio())) {
+            if (!existente.isEstado() || existente.getCantidadEntradas() <= 0) {
+                continue;
+            }
+            if (existente.getFechaFin() == null || existente.getFechaFin().isBefore(hoy)) {
+                continue;
+            }
+            if (seSuperpone(nuevo.getFechaInicio(), nuevo.getFechaFin(), existente.getFechaInicio(), existente.getFechaFin())) {
+                int respuesta = JOptionPane.showConfirmDialog(
+                        this,
+                        "Este nuevo pase se superpone con otro que aún tiene entradas disponibles. ¿Creamos igualmente este nuevo pase?",
+                        "Pase superpuesto",
+                        JOptionPane.YES_NO_OPTION
+                );
+                return respuesta == JOptionPane.YES_OPTION;
+            }
+        }
+        return true;
+    }
+
+    private boolean seSuperpone(LocalDate inicioNuevo, LocalDate finNuevo, LocalDate inicioExistente, LocalDate finExistente) {
+        if (inicioNuevo == null || finNuevo == null || inicioExistente == null || finExistente == null) {
+            return false;
+        }
+        return !inicioNuevo.isAfter(finExistente) && !inicioExistente.isAfter(finNuevo);
+    }
+
     private boolean esActivoManual() {
         return !radioEstadoInactivo.isSelected();
     }
@@ -579,7 +608,7 @@ public class VistaPases extends javax.swing.JInternalFrame {
         panelDetalleLayout.setVerticalGroup(
             panelDetalleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelDetalleLayout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap()
                 .addGroup(panelDetalleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lblCantidadEntradas)
                     .addComponent(txtEntradasDisponibles, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -616,7 +645,7 @@ public class VistaPases extends javax.swing.JInternalFrame {
                 .addGroup(panelDetalleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnCancelar)
                     .addComponent(btnGuardar))
-                .addGap(18, 18, 18))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         panelSocio.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -823,6 +852,9 @@ public class VistaPases extends javax.swing.JInternalFrame {
 
         try {
             if (pase.getIdPase() == 0) {
+                if (!confirmarSiSeSuperpone(pase)) {
+                    return;
+                }
                 paseData.guardarPase(pase);
                 JOptionPane.showMessageDialog(this, "Pase guardado con ID " + pase.getIdPase() + ".");
             } else {
