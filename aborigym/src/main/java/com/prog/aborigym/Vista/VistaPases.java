@@ -75,7 +75,10 @@ public class VistaPases extends javax.swing.JInternalFrame {
         modeloSocios.addColumn("DNI");
         modeloSocios.addColumn("Apellido");
         modeloSocios.addColumn("Nombre");
+        modeloSocios.addColumn("PASE");
         tablaSocios.setModel(modeloSocios);
+        tablaSocios.getColumnModel().getColumn(3).setPreferredWidth(70);
+        tablaSocios.getColumnModel().getColumn(3).setMaxWidth(90);
     }
 
     private void prepararFechas() {
@@ -350,6 +353,9 @@ public class VistaPases extends javax.swing.JInternalFrame {
         tablaSocios.clearSelection();
 
         try {
+            List<Integer> conPaseVigente = paseData.listarSociosConPaseVigente(LocalDate.now());
+            List<Socio> conPase = new ArrayList<>();
+            List<Socio> sinPase = new ArrayList<>();
             for (Socio socio : socioData.listarSocios()) {
                 if (!socio.isEstado()) {
                     continue;
@@ -357,11 +363,21 @@ public class VistaPases extends javax.swing.JInternalFrame {
                 if (!texto.isEmpty() && !coincideSocio(socio, texto)) {
                     continue;
                 }
-                sociosVisibles.add(socio);
+                if (conPaseVigente.contains(socio.getIdSocio())) {
+                    conPase.add(socio);
+                } else {
+                    sinPase.add(socio);
+                }
+            }
+            sociosVisibles.addAll(conPase);
+            sociosVisibles.addAll(sinPase);
+            for (Socio socio : sociosVisibles) {
+                String pase = conPaseVigente.contains(socio.getIdSocio()) ? "vigente" : "";
                 modeloSocios.addRow(new Object[]{
                     socio.getDni(),
                     socio.getApellido(),
-                    socio.getNombre()
+                    socio.getNombre(),
+                    pase
                 });
             }
             if (avisarSiVacio && sociosVisibles.isEmpty()) {
@@ -428,6 +444,7 @@ public class VistaPases extends javax.swing.JInternalFrame {
         txtBuscarSocio = new javax.swing.JTextField();
         lblTituloSocios1 = new javax.swing.JLabel();
         lblTituloSocios2 = new javax.swing.JLabel();
+        jScrollPaneSocios = new javax.swing.JScrollPane();
         tablaSocios = new javax.swing.JTable();
         lblTituloPases = new javax.swing.JLabel();
 
@@ -645,6 +662,7 @@ public class VistaPases extends javax.swing.JInternalFrame {
                 tablaSociosMouseClicked(evt);
             }
         });
+        jScrollPaneSocios.setViewportView(tablaSocios);
 
         javax.swing.GroupLayout panelSocioLayout = new javax.swing.GroupLayout(panelSocio);
         panelSocio.setLayout(panelSocioLayout);
@@ -654,8 +672,8 @@ public class VistaPases extends javax.swing.JInternalFrame {
                 .addGroup(panelSocioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(lblTituloSocios)
                     .addGroup(panelSocioLayout.createSequentialGroup()
-                        .addComponent(tablaSocios, javax.swing.GroupLayout.PREFERRED_SIZE, 421, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
+                        .addComponent(jScrollPaneSocios, javax.swing.GroupLayout.PREFERRED_SIZE, 427, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(panelSocioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(panelSocioLayout.createSequentialGroup()
                                 .addComponent(txtBuscarSocio, javax.swing.GroupLayout.PREFERRED_SIZE, 166, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -680,7 +698,7 @@ public class VistaPases extends javax.swing.JInternalFrame {
                         .addComponent(lblTituloSocios1)
                         .addGap(1, 1, 1)
                         .addComponent(lblTituloSocios2))
-                    .addComponent(tablaSocios, javax.swing.GroupLayout.PREFERRED_SIZE, 127, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jScrollPaneSocios, javax.swing.GroupLayout.PREFERRED_SIZE, 146, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -721,7 +739,7 @@ public class VistaPases extends javax.swing.JInternalFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(panelDetalle, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
-                .addContainerGap(18, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
@@ -732,22 +750,26 @@ public class VistaPases extends javax.swing.JInternalFrame {
             return;
         }
 
-        int fila = tablaPases.getSelectedRow();
-
-        if (fila >= 0) {
-            int id = Integer.parseInt(modeloTabla.getValueAt(fila, 0).toString());
-
-            try {
-                Pase pase = paseData.obtenerPase(id);
-                if (pase != null) {
-                    mostrarPase(pase);
-                    habilitarEdicion(false);
-                }
-            } catch (SQLException ex) {
-                JOptionPane.showMessageDialog(this, "No se pudo cargar el pase: " + ex.getMessage());
-            }
-        }
+        mostrarPaseDeFila(tablaPases.getSelectedRow());
     }//GEN-LAST:event_tablaPasesMouseClicked
+
+    private void mostrarPaseDeFila(int fila) {
+        if (fila < 0 || fila >= modeloTabla.getRowCount()) {
+            return;
+        }
+
+        int id = Integer.parseInt(modeloTabla.getValueAt(fila, 0).toString());
+
+        try {
+            Pase pase = paseData.obtenerPase(id);
+            if (pase != null) {
+                mostrarPase(pase);
+                habilitarEdicion(false);
+            }
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(this, "No se pudo cargar el pase: " + ex.getMessage());
+        }
+    }
 
     private void btnEditarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditarActionPerformed
         if (txtId.getText().trim().isEmpty()) {
@@ -780,6 +802,11 @@ public class VistaPases extends javax.swing.JInternalFrame {
         }
         socioSeleccionado = sociosVisibles.get(fila);
         actualizarBotones();
+        if (modeloTabla.getRowCount() > 0 && tablaPases.isEnabled()) {
+            tablaPases.setRowSelectionInterval(0, 0);
+            tablaPases.scrollRectToVisible(tablaPases.getCellRect(0, 0, true));
+            mostrarPaseDeFila(0);
+        }
     }//GEN-LAST:event_tablaSociosMouseClicked
 
     private void btnCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelarActionPerformed
@@ -824,6 +851,7 @@ public class VistaPases extends javax.swing.JInternalFrame {
     private javax.swing.JButton btnNuevo;
     private javax.swing.ButtonGroup buttonGroupEstado;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPaneSocios;
     private javax.swing.JLabel lblCantidadEntradas;
     private javax.swing.JLabel lblCantidadEntradasUsadas;
     private javax.swing.JLabel lblFin;

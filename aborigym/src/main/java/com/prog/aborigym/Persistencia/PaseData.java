@@ -40,6 +40,25 @@ public class PaseData {
         }
     }
 
+    public List<Integer> listarSociosConPaseVigente(LocalDate fecha) throws SQLException {
+        String sql = "SELECT DISTINCT id_socio FROM pase WHERE estado = ? AND cantidad_entradas > 0 "
+                + "AND fecha_inicio <= ? AND fecha_fin >= ?";
+        List<Integer> socios = new ArrayList<>();
+
+        try (PreparedStatement ps = conexion.buscarConexion().prepareStatement(sql)) {
+            ps.setBoolean(1, true);
+            ps.setObject(2, fecha);
+            ps.setObject(3, fecha);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    socios.add(rs.getInt("id_socio"));
+                }
+            }
+        }
+        return socios;
+    }
+
     public Pase obtenerPaseActivoConEntradas(int idSocio, LocalDate fecha) throws SQLException {
         String sql = "SELECT * FROM pase WHERE id_socio = ? AND estado = ? AND cantidad_entradas > 0 "
                 + "AND fecha_inicio <= ? AND fecha_fin >= ? ORDER BY fecha_fin LIMIT 1";
