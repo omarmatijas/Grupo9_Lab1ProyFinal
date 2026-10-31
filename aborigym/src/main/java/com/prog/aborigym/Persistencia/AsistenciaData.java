@@ -193,6 +193,21 @@ public class AsistenciaData {
         }
     }
 
+    public int contarAsistenciasPorPase(int idPase) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM asistencia WHERE id_pase = ?";
+
+        try (PreparedStatement ps = conexion.buscarConexion().prepareStatement(sql)) {
+            ps.setInt(1, idPase);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+                return 0;
+            }
+        }
+    }
+
     public boolean existeAsistencia(int idSocio, int idClase, LocalDate fecha) throws SQLException {
         String sql = "SELECT id_asistencia FROM asistencia WHERE id_socio = ? AND id_clase = ? AND fecha_asistencia = ?";
 
