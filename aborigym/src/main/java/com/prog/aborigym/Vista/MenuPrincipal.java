@@ -28,6 +28,7 @@ public class MenuPrincipal extends javax.swing.JFrame {
 
     public MenuPrincipal() {
         initComponents();
+        escritorio.moveToBack(lblLogo);
         setSize(1000, 650);
         setLocationRelativeTo(null);
         setResizable(false);
@@ -61,6 +62,7 @@ public class MenuPrincipal extends javax.swing.JFrame {
             ventana.setMaximizable(true);
             ventana.setResizable(true);
             escritorio.add(ventana);
+            escritorio.moveToBack(lblLogo);
 
             ubicar(ventana, false);
         }
@@ -92,6 +94,7 @@ public class MenuPrincipal extends javax.swing.JFrame {
     private void initComponents() {
 
         escritorio = new javax.swing.JDesktopPane();
+        lblLogo = new javax.swing.JLabel();
         menuBar = new javax.swing.JMenuBar();
         menuSocios = new javax.swing.JMenu();
         gestionSocios = new javax.swing.JMenuItem();
@@ -108,15 +111,22 @@ public class MenuPrincipal extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Aborigym");
 
+        escritorio.setBackground(new java.awt.Color(206, 168, 126));
+
+        lblLogo.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblLogo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/prog/aborigym/Vista/logo_aborigym.jpg"))); // NOI18N
+
+        escritorio.setLayer(lblLogo, javax.swing.JLayeredPane.DEFAULT_LAYER);
+
         javax.swing.GroupLayout escritorioLayout = new javax.swing.GroupLayout(escritorio);
         escritorio.setLayout(escritorioLayout);
         escritorioLayout.setHorizontalGroup(
             escritorioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 569, Short.MAX_VALUE)
+            .addComponent(lblLogo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         escritorioLayout.setVerticalGroup(
             escritorioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 422, Short.MAX_VALUE)
+            .addComponent(lblLogo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         menuSocios.setText("Socios");
@@ -284,6 +294,7 @@ public class MenuPrincipal extends javax.swing.JFrame {
     private javax.swing.JMenuItem gestionEntrenadores;
     private javax.swing.JMenuItem gestionPases;
     private javax.swing.JMenuItem gestionSocios;
+    private javax.swing.JLabel lblLogo;
     private javax.swing.JMenuItem marcarAsistencia;
     private javax.swing.JMenu menuAsistencia;
     private javax.swing.JMenuBar menuBar;
