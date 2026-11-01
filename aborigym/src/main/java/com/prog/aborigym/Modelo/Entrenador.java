@@ -12,7 +12,7 @@ public class Entrenador {
     private String apellido;
     private String especialidad;
     private boolean estado;
-
+    
     // No es necesario el constructor vacío, por ahora public Entrenador() { } 
     public Entrenador(String dni, String nombre, String apellido, String especialidad, boolean estado) {
         this.dni = dni;
