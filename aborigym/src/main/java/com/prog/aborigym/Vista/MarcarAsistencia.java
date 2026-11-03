@@ -6,6 +6,7 @@ package com.prog.aborigym.Vista;
 
 import com.prog.aborigym.Modelo.Asistencia;
 import com.prog.aborigym.Modelo.ClaseGym;
+import com.prog.aborigym.Modelo.Disciplinas;
 import com.prog.aborigym.Modelo.Entrenador;
 import com.prog.aborigym.Modelo.Pase;
 import com.prog.aborigym.Modelo.Socio;
@@ -54,6 +55,7 @@ public class MarcarAsistencia extends javax.swing.JInternalFrame {
     private ClaseGym claseSeleccionada;
     private LocalDate fechaValida;
     private boolean ajustandoFecha;
+    private boolean cargandoCombos;
 
     public MarcarAsistencia(Conexion con) {
         socioData = new SocioData(con);
@@ -68,7 +70,7 @@ public class MarcarAsistencia extends javax.swing.JInternalFrame {
         armarTablas();
         agruparRadios();
         prepararFecha();
-        cargarEntrenadores();
+        prepararFiltro();
         cargarClases(false);
     }
 
@@ -102,8 +104,8 @@ public class MarcarAsistencia extends javax.swing.JInternalFrame {
         modeloClases.addColumn("Disciplina");
         modeloClases.addColumn("Entrenador");
         modeloClases.addColumn("Horario");
-        modeloClases.addColumn("Capacidad");
-        modeloClases.addColumn("Libres");
+        modeloClases.addColumn("Lugares");
+        modeloClases.addColumn("Estado");
         tablaClases.setModel(modeloClases);
         tablaClases.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tablaClases.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
@@ -112,9 +114,7 @@ public class MarcarAsistencia extends javax.swing.JInternalFrame {
         tablaClases.getColumnModel().getColumn(2).setPreferredWidth(62);
         tablaClases.getColumnModel().getColumn(2).setMaxWidth(72);
         tablaClases.getColumnModel().getColumn(3).setPreferredWidth(72);
-        tablaClases.getColumnModel().getColumn(3).setMaxWidth(90);
-        tablaClases.getColumnModel().getColumn(4).setPreferredWidth(58);
-        tablaClases.getColumnModel().getColumn(4).setMaxWidth(70);
+        tablaClases.getColumnModel().getColumn(4).setPreferredWidth(75);
     }
 
     private void cargarSocios(boolean avisarSiFaltaClase) {
@@ -225,16 +225,17 @@ public class MarcarAsistencia extends javax.swing.JInternalFrame {
         }
 
         Entrenador entrenador = (Entrenador) cboEntrenadorBuscar.getSelectedItem();
+        String disciplina = (String) cboDisciplinaBuscar.getSelectedItem();
         boolean soloActivas = radioActivos.isSelected();
         boolean soloInactivas = radioInactivos.isSelected();
         List<ClaseGym> filtradas;
         List<Integer> lugaresLibres = new ArrayList<>();
         try {
             Map<Integer, Integer> cantidades = asistenciaData.contarAsistenciaClases(
-                    fecha, txtDisciplinaBuscar.getText(), entrenador, horario, soloActivas, soloInactivas);
+                    fecha, disciplina, entrenador, horario, soloActivas, soloInactivas);
             filtradas = FiltroClases.filtrar(
                     claseGymData.listarClasesGym(),
-                    txtDisciplinaBuscar.getText(),
+                    disciplina,
                     entrenador,
                     horario,
                     soloActivas,
@@ -279,8 +280,8 @@ public class MarcarAsistencia extends javax.swing.JInternalFrame {
                 c.getDisciplina(),
                 nombreEntrenador,
                 horarioTextoFila,
-                c.getCapacidad(),
-                lugaresLibres.get(i)
+                lugaresLibres.get(i) + "/" + c.getCapacidad(),
+                c.isEstado() ? "Activo" : "Inactivo"
             });
             if (c.getIdClase() == idClase) {
                 claseSeleccionada = c;
@@ -353,9 +354,17 @@ public class MarcarAsistencia extends javax.swing.JInternalFrame {
         return valor.toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate();
     }
 
-    private void cargarEntrenadores() {
-        cboEntrenadorBuscar.removeAllItems();
-        cboEntrenadorBuscar.addItem(null);
+    private void prepararFiltro() {
+        cboDisciplinaBuscar.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public java.awt.Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value == null) {
+                    setText("Todas");
+                }
+                return this;
+            }
+        });
         cboEntrenadorBuscar.setRenderer(new DefaultListCellRenderer() {
             @Override
             public java.awt.Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
@@ -366,15 +375,66 @@ public class MarcarAsistencia extends javax.swing.JInternalFrame {
                 return this;
             }
         });
+        cboDisciplinaBuscar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                if (!cargandoCombos) {
+                    cargarEntrenadores();
+                }
+            }
+        });
+
+        cargandoCombos = true;
+        cboDisciplinaBuscar.removeAllItems();
+        cboDisciplinaBuscar.addItem(null);
+        for (String disciplina : Disciplinas.LISTA) {
+            cboDisciplinaBuscar.addItem(disciplina);
+        }
+        cboDisciplinaBuscar.setSelectedIndex(0);
+        cargandoCombos = false;
+        cargarEntrenadores();
+    }
+
+    private void cargarEntrenadores() {
+        Entrenador conservar = (Entrenador) cboEntrenadorBuscar.getSelectedItem();
+        String disciplina = (String) cboDisciplinaBuscar.getSelectedItem();
+        cargandoCombos = true;
+        cboEntrenadorBuscar.removeAllItems();
+        cboEntrenadorBuscar.addItem(null);
 
         try {
-            for (Entrenador e : entrenadorData.listarEntrenadores()) {
+            List<Entrenador> lista;
+            if (disciplina == null || disciplina.trim().isEmpty()) {
+                lista = entrenadorData.listarEntrenadores();
+            } else {
+                lista = entrenadorData.listarEntrenadoresPorEspecialidad(disciplina);
+            }
+            for (Entrenador e : lista) {
                 cboEntrenadorBuscar.addItem(e);
             }
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(this, "No se pudieron cargar los entrenadores. " + ex.getMessage());
         }
-        cboEntrenadorBuscar.setSelectedIndex(0);
+
+        seleccionarEntrenador(conservar);
+        if (cboEntrenadorBuscar.getSelectedIndex() < 0 && cboEntrenadorBuscar.getItemCount() > 0) {
+            cboEntrenadorBuscar.setSelectedIndex(0);
+        }
+        cargandoCombos = false;
+    }
+
+    private void seleccionarEntrenador(Entrenador entrenador) {
+        if (entrenador == null) {
+            cboEntrenadorBuscar.setSelectedIndex(-1);
+            return;
+        }
+        for (int i = 0; i < cboEntrenadorBuscar.getItemCount(); i++) {
+            Entrenador item = cboEntrenadorBuscar.getItemAt(i);
+            if (item != null && item.getIdEntrenador() == entrenador.getIdEntrenador()) {
+                cboEntrenadorBuscar.setSelectedIndex(i);
+                return;
+            }
+        }
+        cboEntrenadorBuscar.setSelectedIndex(-1);
     }
 
     private boolean coincideSocio(Socio socio, String texto) {
@@ -413,7 +473,7 @@ public class MarcarAsistencia extends javax.swing.JInternalFrame {
         lblHorario1 = new javax.swing.JLabel();
         txtHorarioBuscar = new javax.swing.JTextField();
         cboEntrenadorBuscar = new javax.swing.JComboBox<>();
-        txtDisciplinaBuscar = new javax.swing.JTextField();
+        cboDisciplinaBuscar = new javax.swing.JComboBox<>();
         btnBuscar = new javax.swing.JButton();
         radioTodos = new javax.swing.JRadioButton();
         radioActivos = new javax.swing.JRadioButton();
@@ -568,7 +628,7 @@ public class MarcarAsistencia extends javax.swing.JInternalFrame {
                     .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                     .addGroup(panelBuscarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                         .addComponent(cboEntrenadorBuscar, 0, 260, Short.MAX_VALUE)
-                        .addComponent(txtDisciplinaBuscar)
+                        .addComponent(cboDisciplinaBuscar, 0, 260, Short.MAX_VALUE)
                         .addComponent(txtHorarioBuscar, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addContainerGap(7, Short.MAX_VALUE)))
         );
@@ -592,7 +652,7 @@ public class MarcarAsistencia extends javax.swing.JInternalFrame {
                     .addGap(11, 11, 11)
                     .addGroup(panelBuscarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(lblDisciplina1)
-                        .addComponent(txtDisciplinaBuscar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(cboDisciplinaBuscar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                     .addGroup(panelBuscarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(lblEntrenador1)
@@ -832,6 +892,7 @@ public class MarcarAsistencia extends javax.swing.JInternalFrame {
     private javax.swing.JButton btnBuscarSocio;
     private javax.swing.JButton btnMarcar;
     private javax.swing.JButton btnMarcar1;
+    private javax.swing.JComboBox<String> cboDisciplinaBuscar;
     private javax.swing.JComboBox<Entrenador> cboEntrenadorBuscar;
     private javax.swing.JScrollPane jScrollPaneClases;
     private javax.swing.JScrollPane jScrollPaneSocios;
@@ -853,7 +914,6 @@ public class MarcarAsistencia extends javax.swing.JInternalFrame {
     private javax.swing.JTable tablaClases;
     private javax.swing.JTable tablaSocios;
     private javax.swing.JTextField txtBuscarSocio;
-    private javax.swing.JTextField txtDisciplinaBuscar;
     private javax.swing.JTextField txtHorarioBuscar;
     // End of variables declaration//GEN-END:variables
 }
