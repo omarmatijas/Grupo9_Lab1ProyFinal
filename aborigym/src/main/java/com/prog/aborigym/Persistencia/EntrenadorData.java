@@ -3,6 +3,7 @@ package com.prog.aborigym.Persistencia;
 import com.prog.aborigym.Modelo.Entrenador;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -192,14 +193,25 @@ public class EntrenadorData {
     }
 
     public static Entrenador parsearRS(ResultSet rs) throws SQLException {
+        String estado = tieneColumna(rs, "estado_entrenador") ? "estado_entrenador" : "estado";
         return new Entrenador(
                 rs.getInt("id_entrenador"),
                 rs.getString("dni"),
                 rs.getString("nombre"),
                 rs.getString("apellido"),
                 rs.getString("especialidad"),
-                rs.getBoolean("estado")
+                rs.getBoolean(estado)
         );
+    }
+
+    private static boolean tieneColumna(ResultSet rs, String columna) throws SQLException {
+        ResultSetMetaData meta = rs.getMetaData();
+        for (int i = 1; i <= meta.getColumnCount(); i++) {
+            if (columna.equalsIgnoreCase(meta.getColumnLabel(i))) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private List<Entrenador> listar(String sql) throws SQLException {

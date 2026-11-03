@@ -4,6 +4,7 @@ import com.prog.aborigym.Modelo.ClaseGym;
 import com.prog.aborigym.Modelo.Entrenador;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalTime;
@@ -15,6 +16,12 @@ import java.util.List;
  * @author Grupo9
  */
 public class ClaseGymData {
+
+    private static final String SQL_CLASE_CON_ENTRENADOR
+            = "SELECT c.id_clase, c.disciplina, c.horario, c.capacidad, c.estado, "
+            + "e.id_entrenador, e.dni, e.nombre, e.apellido, e.especialidad, "
+            + "e.estado AS estado_entrenador "
+            + "FROM clasegym c INNER JOIN entrenador e ON c.id_entrenador = e.id_entrenador";
 
     private final Conexion conexion;
     private final EntrenadorData entrenadorData;
@@ -96,7 +103,7 @@ public class ClaseGymData {
     }
 
     public ClaseGym obtenerClaseGym(int idClase) throws SQLException {
-        String sql = "SELECT * FROM clasegym WHERE id_clase = ?";
+        String sql = SQL_CLASE_CON_ENTRENADOR + " WHERE c.id_clase = ?";
 
         try (PreparedStatement ps = conexion.buscarConexion().prepareStatement(sql)) {
             ps.setInt(1, idClase);
@@ -111,17 +118,17 @@ public class ClaseGymData {
     }
 
     public List<ClaseGym> listarClasesGym() throws SQLException {
-        String sql = "SELECT * FROM clasegym ORDER BY horario, disciplina";
+        String sql = SQL_CLASE_CON_ENTRENADOR + " ORDER BY c.horario, c.disciplina";
         return listar(sql, null);
     }
 
     public List<ClaseGym> listarClasesGymPorDisciplina(String disciplina) throws SQLException {
-        String sql = "SELECT * FROM clasegym WHERE disciplina = ? ORDER BY horario, disciplina";
+        String sql = SQL_CLASE_CON_ENTRENADOR + " WHERE c.disciplina = ? ORDER BY c.horario, c.disciplina";
         return listar(sql, disciplina);
     }
 
     public List<ClaseGym> listarClasesGymPorEntrenador(int idEntrenador) throws SQLException {
-        String sql = "SELECT * FROM clasegym WHERE id_entrenador = ? ORDER BY horario, disciplina";
+        String sql = SQL_CLASE_CON_ENTRENADOR + " WHERE c.id_entrenador = ? ORDER BY c.horario, c.disciplina";
         List<ClaseGym> lista = new ArrayList<>();
 
         try (PreparedStatement ps = conexion.buscarConexion().prepareStatement(sql)) {
@@ -180,8 +187,23 @@ public class ClaseGymData {
     }
 
     private ClaseGym armarClase(ResultSet rs) throws SQLException {
-        Entrenador entrenador = entrenadorData.obtenerEntrenador(rs.getInt("id_entrenador"));
+        Entrenador entrenador;
+        if (tieneColumna(rs, "estado_entrenador")) {
+            entrenador = EntrenadorData.parsearRS(rs);
+        } else {
+            entrenador = entrenadorData.obtenerEntrenador(rs.getInt("id_entrenador"));
+        }
         return parsearRS(rs, entrenador);
+    }
+
+    private boolean tieneColumna(ResultSet rs, String columna) throws SQLException {
+        ResultSetMetaData meta = rs.getMetaData();
+        for (int i = 1; i <= meta.getColumnCount(); i++) {
+            if (columna.equalsIgnoreCase(meta.getColumnLabel(i))) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void validarHorarioEntrenador(ClaseGym clase) throws SQLException {
