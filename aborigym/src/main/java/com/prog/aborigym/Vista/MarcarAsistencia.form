@@ -230,7 +230,7 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Component id="btnBuscar" min="-2" pref="116" max="-2" attributes="0"/>
                       <Group type="102" attributes="0">
-                          <Component id="radioActivos1" min="-2" max="-2" attributes="0"/>
+                          <Component id="radioConVacantes" min="-2" max="-2" attributes="0"/>
                           <EmptySpace type="separate" max="-2" attributes="0"/>
                           <Component id="radioTodos1" min="-2" pref="70" max="-2" attributes="0"/>
                       </Group>
@@ -274,7 +274,7 @@
                   </Group>
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
-                      <Component id="radioActivos1" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="radioConVacantes" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="radioTodos1" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
@@ -378,13 +378,13 @@
             <Property name="text" type="java.lang.String" value="Inactivas"/>
           </Properties>
         </Component>
-        <Component class="javax.swing.JRadioButton" name="radioActivos1">
+        <Component class="javax.swing.JRadioButton" name="radioConVacantes">
           <Properties>
             <Property name="selected" type="boolean" value="true"/>
             <Property name="text" type="java.lang.String" value="Solo con vacantes"/>
           </Properties>
           <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="radioActivos1ActionPerformed"/>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="radioConVacantesActionPerformed"/>
           </Events>
         </Component>
         <Component class="javax.swing.JRadioButton" name="radioTodos1">

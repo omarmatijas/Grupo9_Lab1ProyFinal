@@ -2,6 +2,7 @@ package com.prog.aborigym.Persistencia;
 
 import com.prog.aborigym.Modelo.Asistencia;
 import com.prog.aborigym.Modelo.Entrenador;
+import com.prog.aborigym.Modelo.Socio;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -155,6 +156,25 @@ public class AsistenciaData {
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     socios.add(rs.getInt("id_socio"));
+                }
+            }
+        }
+        return socios;
+    }
+
+    public List<Socio> listarSocios(int idClase, LocalDate fecha) throws SQLException {
+        String sql = "SELECT s.id_socio, s.dni, s.nombre, s.apellido, s.edad, s.correo, s.telefono, s.estado "
+                + "FROM asistencia asist INNER JOIN socio s ON s.id_socio = asist.id_socio "
+                + "WHERE asist.id_clase = ? AND asist.fecha_asistencia = ?";
+        List<Socio> socios = new ArrayList<>();
+
+        try (PreparedStatement ps = conexion.buscarConexion().prepareStatement(sql)) {
+            ps.setInt(1, idClase);
+            ps.setObject(2, fecha);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    socios.add(SocioData.parsearRS(rs));
                 }
             }
         }

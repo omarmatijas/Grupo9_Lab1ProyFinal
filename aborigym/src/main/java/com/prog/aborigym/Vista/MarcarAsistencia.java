@@ -248,7 +248,7 @@ public class MarcarAsistencia extends javax.swing.JInternalFrame {
                 if (libres < 0) {
                     libres = 0;
                 }
-                if (radioActivos1.isSelected() && libres == 0) {
+                if (radioConVacantes.isSelected() && libres == 0) {
                     continue;
                 }
                 visibles.add(c);
@@ -302,7 +302,7 @@ public class MarcarAsistencia extends javax.swing.JInternalFrame {
         estado.add(radioInactivos);
 
         ButtonGroup vacantes = new ButtonGroup();
-        vacantes.add(radioActivos1);
+        vacantes.add(radioConVacantes);
         vacantes.add(radioTodos1);
     }
 
@@ -478,7 +478,7 @@ public class MarcarAsistencia extends javax.swing.JInternalFrame {
         radioTodos = new javax.swing.JRadioButton();
         radioActivos = new javax.swing.JRadioButton();
         radioInactivos = new javax.swing.JRadioButton();
-        radioActivos1 = new javax.swing.JRadioButton();
+        radioConVacantes = new javax.swing.JRadioButton();
         radioTodos1 = new javax.swing.JRadioButton();
         lblTituloSocios1 = new javax.swing.JLabel();
         lblTituloSocios2 = new javax.swing.JLabel();
@@ -589,11 +589,11 @@ public class MarcarAsistencia extends javax.swing.JInternalFrame {
 
         radioInactivos.setText("Inactivas");
 
-        radioActivos1.setSelected(true);
-        radioActivos1.setText("Solo con vacantes");
-        radioActivos1.addActionListener(new java.awt.event.ActionListener() {
+        radioConVacantes.setSelected(true);
+        radioConVacantes.setText("Solo con vacantes");
+        radioConVacantes.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                radioActivos1ActionPerformed(evt);
+                radioConVacantesActionPerformed(evt);
             }
         });
 
@@ -608,7 +608,7 @@ public class MarcarAsistencia extends javax.swing.JInternalFrame {
                 .addGroup(panelBuscarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(btnBuscar, javax.swing.GroupLayout.PREFERRED_SIZE, 116, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(panelBuscarLayout.createSequentialGroup()
-                        .addComponent(radioActivos1)
+                        .addComponent(radioConVacantes)
                         .addGap(18, 18, 18)
                         .addComponent(radioTodos1, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(panelBuscarLayout.createSequentialGroup()
@@ -642,7 +642,7 @@ public class MarcarAsistencia extends javax.swing.JInternalFrame {
                     .addComponent(radioInactivos))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(panelBuscarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(radioActivos1)
+                    .addComponent(radioConVacantes)
                     .addComponent(radioTodos1))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(btnBuscar)
@@ -838,9 +838,9 @@ public class MarcarAsistencia extends javax.swing.JInternalFrame {
         cargarClases(true);
     }//GEN-LAST:event_btnBuscarActionPerformed
 
-    private void radioActivos1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_radioActivos1ActionPerformed
+    private void radioConVacantesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_radioConVacantesActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_radioActivos1ActionPerformed
+    }//GEN-LAST:event_radioConVacantesActionPerformed
 
     private void txtHorarioBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtHorarioBuscarActionPerformed
         // TODO add your handling code here:
@@ -906,7 +906,7 @@ public class MarcarAsistencia extends javax.swing.JInternalFrame {
     private javax.swing.JLabel lblTituloSocios2;
     private javax.swing.JPanel panelBuscar;
     private javax.swing.JRadioButton radioActivos;
-    private javax.swing.JRadioButton radioActivos1;
+    private javax.swing.JRadioButton radioConVacantes;
     private javax.swing.JRadioButton radioInactivos;
     private javax.swing.JRadioButton radioTodos;
     private javax.swing.JRadioButton radioTodos1;
