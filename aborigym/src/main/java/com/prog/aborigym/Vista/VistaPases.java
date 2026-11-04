@@ -14,6 +14,7 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
@@ -183,8 +184,9 @@ public class VistaPases extends javax.swing.JInternalFrame {
         }
 
         try {
-            for (Pase pase : paseData.listarPasesPorSocio(socioSeleccionado.getIdSocio())) {
-                int usadas = asistenciaData.contarAsistenciasPorPase(pase.getIdPase());
+            Map<Pase, Integer> pases = paseData.listarPasesConConsumo(socioSeleccionado);
+            for (Pase pase : pases.keySet()) {
+                int usadas = pases.get(pase);
                 modeloTabla.addRow(new Object[]{
                     pase.getIdPase(),
                     pase.getCantidadEntradas(),
@@ -382,7 +384,7 @@ public class VistaPases extends javax.swing.JInternalFrame {
         tablaSocios.clearSelection();
 
         try {
-            List<Integer> conPaseVigente = paseData.listarSociosConPaseVigente(LocalDate.now());
+            Map<Integer, int[]> conPaseVigente = paseData.listarEntradasPaseActivo(LocalDate.now());
             List<Socio> conPase = new ArrayList<>();
             List<Socio> sinPase = new ArrayList<>();
             for (Socio socio : socioData.listarSocios()) {
@@ -392,7 +394,7 @@ public class VistaPases extends javax.swing.JInternalFrame {
                 if (!texto.isEmpty() && !coincideSocio(socio, texto)) {
                     continue;
                 }
-                if (conPaseVigente.contains(socio.getIdSocio())) {
+                if (conPaseVigente.containsKey(socio.getIdSocio())) {
                     conPase.add(socio);
                 } else {
                     sinPase.add(socio);
@@ -401,7 +403,13 @@ public class VistaPases extends javax.swing.JInternalFrame {
             sociosVisibles.addAll(conPase);
             sociosVisibles.addAll(sinPase);
             for (Socio socio : sociosVisibles) {
-                String pase = conPaseVigente.contains(socio.getIdSocio()) ? "vigente" : "";
+                String pase = "";
+                int[] entradas = conPaseVigente.get(socio.getIdSocio());
+                if (entradas != null) {
+                    int restantes = entradas[0];
+                    int total = entradas[0] + entradas[1];
+                    pase = restantes + " de " + total;
+                }
                 modeloSocios.addRow(new Object[]{
                     socio.getDni(),
                     socio.getApellido(),

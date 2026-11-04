@@ -11,7 +11,7 @@ import javax.swing.JOptionPane;
 public class MenuPrincipal extends javax.swing.JFrame {
 
     private static final String HOST = "localhost";
-    private static final String PORT = "3307";
+    private static final String PORT = "3306";
     private static final String DB_NAME = "grupo9_aborigym";
     private static final String USER = "root";
     private static final String PASSWORD = "";
