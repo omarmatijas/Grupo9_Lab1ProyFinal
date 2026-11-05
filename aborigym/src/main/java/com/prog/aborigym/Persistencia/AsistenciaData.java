@@ -129,6 +129,42 @@ public class AsistenciaData {
         return cantidades;
     }
 
+    /**
+     * Consulta 2: historial de asistencias del socio en su pase vigente.
+     * Asistencia JOIN Socio JOIN Pase (y JOIN ClaseGym y Entrenador para
+     * mostrar la clase). Cada fila: fecha, disciplina, horario, entrenador.
+     */
+    public List<Object[]> historialPaseActual(int idSocio, LocalDate fecha) throws SQLException {
+        String sql = "SELECT a.fecha_asistencia, c.disciplina, c.horario, "
+                + "e.apellido AS ent_apellido, e.nombre AS ent_nombre "
+                + "FROM asistencia a "
+                + "JOIN socio s ON s.id_socio = a.id_socio "
+                + "JOIN pase p ON p.id_pase = a.id_pase "
+                + "JOIN clasegym c ON c.id_clase = a.id_clase "
+                + "JOIN entrenador e ON e.id_entrenador = c.id_entrenador "
+                + "WHERE s.id_socio = ? AND p.estado = 1 "
+                + "AND p.fecha_inicio <= ? AND p.fecha_fin >= ? "
+                + "ORDER BY a.fecha_asistencia DESC, c.horario";
+        List<Object[]> filas = new ArrayList<>();
+
+        try (PreparedStatement ps = conexion.buscarConexion().prepareStatement(sql)) {
+            ps.setInt(1, idSocio);
+            ps.setObject(2, fecha);
+            ps.setObject(3, fecha);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    filas.add(new Object[]{
+                        rs.getObject("fecha_asistencia", LocalDate.class),
+                        rs.getString("disciplina"),
+                        rs.getObject("horario", LocalTime.class),
+                        rs.getString("ent_apellido") + ", " + rs.getString("ent_nombre")
+                    });
+                }
+            }
+        }
+        return filas;
+    }
+
     public int contarAsistencias(int idClase, LocalDate fecha) throws SQLException {
         String sql = "SELECT COUNT(*) FROM asistencia WHERE id_clase = ? AND fecha_asistencia = ?";
 

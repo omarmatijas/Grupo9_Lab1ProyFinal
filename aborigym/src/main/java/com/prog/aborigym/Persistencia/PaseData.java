@@ -8,7 +8,9 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -77,6 +79,64 @@ public class PaseData {
                 return null;
             }
         }
+    }
+
+    /**
+     * Consulta 3: entradas restantes del pase activo de cada socio. Socio JOIN
+     * Pase, y LEFT JOIN Asistencia para contar las consumidas. Devuelve idSocio
+     * -> {restantes, consumidas}. Si un socio tiene dos pases vigentes, se
+     * queda con el que vence primero (el mismo que usa Marcar asistencia).
+     */
+    public Map<Integer, int[]> listarEntradasPaseActivo(LocalDate fecha) throws SQLException {
+        String sql = "SELECT s.id_socio, p.id_pase, p.cantidad_entradas AS restantes, "
+                + "COUNT(a.id_asistencia) AS consumidas "
+                + "FROM socio s "
+                + "JOIN pase p ON p.id_socio = s.id_socio "
+                + "LEFT JOIN asistencia a ON a.id_pase = p.id_pase "
+                + "WHERE p.estado = 1 AND p.cantidad_entradas > 0 "
+                + "AND p.fecha_inicio <= ? AND p.fecha_fin >= ? "
+                + "GROUP BY s.id_socio, p.id_pase, p.cantidad_entradas, p.fecha_fin "
+                + "ORDER BY p.fecha_fin";
+        Map<Integer, int[]> resultado = new LinkedHashMap<>();
+
+        try (PreparedStatement ps = conexion.buscarConexion().prepareStatement(sql)) {
+            ps.setObject(1, fecha);
+            ps.setObject(2, fecha);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    resultado.putIfAbsent(rs.getInt("id_socio"),
+                            new int[]{rs.getInt("restantes"), rs.getInt("consumidas")});
+                }
+            }
+        }
+        return resultado;
+    }
+
+    /**
+     * Pases de un socio con las entradas consumidas de cada uno. Pase JOIN
+     * Socio, y LEFT JOIN Asistencia para contar las consumidas. Devuelve pase
+     * -> consumidas, del más nuevo al más viejo.
+     */
+    public Map<Pase, Integer> listarPasesConConsumo(Socio socio) throws SQLException {
+        String sql = "SELECT p.id_pase, p.cantidad_entradas, p.fecha_inicio, p.fecha_fin, p.costo, p.estado, "
+                + "COUNT(a.id_asistencia) AS consumidas "
+                + "FROM pase p "
+                + "JOIN socio s ON s.id_socio = p.id_socio "
+                + "LEFT JOIN asistencia a ON a.id_pase = p.id_pase "
+                + "WHERE s.id_socio = ? "
+                + "GROUP BY p.id_pase, p.cantidad_entradas, p.fecha_inicio, p.fecha_fin, p.costo, p.estado "
+                + "ORDER BY p.fecha_fin DESC, p.id_pase DESC";
+        Map<Pase, Integer> resultado = new LinkedHashMap<>();
+
+        try (PreparedStatement ps = conexion.buscarConexion().prepareStatement(sql)) {
+            ps.setInt(1, socio.getIdSocio());
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    resultado.put(parsearRS(rs, socio), rs.getInt("consumidas"));
+                }
+            }
+        }
+        return resultado;
     }
 
     public List<Pase> listarPasesPorSocio(int idSocio) throws SQLException {
