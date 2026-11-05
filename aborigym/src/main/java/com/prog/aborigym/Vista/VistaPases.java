@@ -28,6 +28,7 @@ public class VistaPases extends javax.swing.JInternalFrame {
     private SocioData socioData;
     private AsistenciaData asistenciaData;
     private DefaultTableModel modeloTabla;
+    private DefaultTableModel modeloHistorial;
     private DefaultTableModel modeloSocios;
     private List<Socio> sociosVisibles;
     private Socio socioSeleccionado;
@@ -80,6 +81,45 @@ public class VistaPases extends javax.swing.JInternalFrame {
         tablaSocios.setModel(modeloSocios);
         tablaSocios.getColumnModel().getColumn(3).setPreferredWidth(70);
         tablaSocios.getColumnModel().getColumn(3).setMaxWidth(90);
+
+        modeloHistorial = new DefaultTableModel() {
+            @Override
+            public boolean isCellEditable(int fila, int columna) {
+                return false;
+            }
+        };
+        modeloHistorial.addColumn("Fecha");
+        modeloHistorial.addColumn("Clase");
+        modeloHistorial.addColumn("Horario");
+        modeloHistorial.addColumn("Entrenador");
+        tablaHistorial.setModel(modeloHistorial);
+    }
+
+    /**
+     * Consulta 2: historial del pase vigente, con usadas y disponibles.
+     */
+    private void cargarHistorial() {
+        modeloHistorial.setRowCount(0);
+        if (socioSeleccionado == null) {
+            lblHistorial.setText("Historial del pase vigente");
+            return;
+        }
+        try {
+            List<Object[]> filas = asistenciaData.historialPaseActual(socioSeleccionado.getIdSocio(), LocalDate.now());
+            for (Object[] fila : filas) {
+                modeloHistorial.addRow(fila);
+            }
+            Pase vigente = paseData.obtenerPaseActivoConEntradas(socioSeleccionado.getIdSocio(), LocalDate.now());
+            if (vigente == null && filas.isEmpty()) {
+                lblHistorial.setText("Historial del pase vigente: el socio no tiene un pase vigente con entradas.");
+            } else {
+                int disponibles = vigente == null ? 0 : vigente.getCantidadEntradas();
+                lblHistorial.setText("Historial del pase vigente: " + filas.size() + " usadas, "
+                        + disponibles + " disponibles.");
+            }
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(this, "No se pudo cargar el historial. " + ex.getMessage());
+        }
     }
 
     private void prepararFechas() {
@@ -441,6 +481,7 @@ public class VistaPases extends javax.swing.JInternalFrame {
         tablaPases.clearSelection();
         habilitarEdicion(false);
         cargarTabla();
+        cargarHistorial();
     }
 
     /**
@@ -484,6 +525,9 @@ public class VistaPases extends javax.swing.JInternalFrame {
         jScrollPaneSocios = new javax.swing.JScrollPane();
         tablaSocios = new javax.swing.JTable();
         lblTituloPases = new javax.swing.JLabel();
+        lblHistorial = new javax.swing.JLabel();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        tablaHistorial = new javax.swing.JTable();
 
         setTitle("Gestión de pases");
 
@@ -741,6 +785,21 @@ public class VistaPases extends javax.swing.JInternalFrame {
 
         lblTituloPases.setText("Pases");
 
+        lblHistorial.setText("Historial del pase vigente");
+
+        tablaHistorial.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {},
+                {},
+                {},
+                {}
+            },
+            new String [] {
+
+            }
+        ));
+        jScrollPane2.setViewportView(tablaHistorial);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -750,9 +809,17 @@ public class VistaPases extends javax.swing.JInternalFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(lblTituloPases)
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 508, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(16, 16, 16)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblHistorial)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                                        .addComponent(lblTituloPases)
+                                        .addGap(0, 0, Short.MAX_VALUE))
+                                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 508, Short.MAX_VALUE))
+                                .addGap(16, 16, 16)))
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(btnEditar)
@@ -775,8 +842,14 @@ public class VistaPases extends javax.swing.JInternalFrame {
                 .addGap(8, 8, 8)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(panelDetalle, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(lblHistorial)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 18, Short.MAX_VALUE)
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 135, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(14, 14, 14)))
+                .addContainerGap())
         );
 
         pack();
@@ -891,10 +964,12 @@ public class VistaPases extends javax.swing.JInternalFrame {
     private javax.swing.JButton btnNuevo;
     private javax.swing.ButtonGroup buttonGroupEstado;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPaneSocios;
     private javax.swing.JLabel lblCantidadEntradas;
     private javax.swing.JLabel lblCantidadEntradasUsadas;
     private javax.swing.JLabel lblFin;
+    private javax.swing.JLabel lblHistorial;
     private javax.swing.JLabel lblID;
     private javax.swing.JLabel lblInicio;
     private javax.swing.JLabel lblPrecio;
@@ -909,6 +984,7 @@ public class VistaPases extends javax.swing.JInternalFrame {
     private javax.swing.JRadioButton radioEstadoInactivo;
     private javax.swing.JSpinner spnFechaFin;
     private javax.swing.JSpinner spnFechaInicio;
+    private javax.swing.JTable tablaHistorial;
     private javax.swing.JTable tablaPases;
     private javax.swing.JTable tablaSocios;
     private javax.swing.JTextField txtBuscarSocio;
