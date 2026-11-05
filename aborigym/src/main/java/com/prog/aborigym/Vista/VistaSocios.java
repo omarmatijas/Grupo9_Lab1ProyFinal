@@ -15,7 +15,7 @@ public class VistaSocios extends javax.swing.JInternalFrame {
 
     private SocioData socioData;
     private DefaultTableModel modeloTabla;
-    
+
     public VistaSocios(Conexion con) {
         socioData = new SocioData(con);
         initComponents();
@@ -25,14 +25,14 @@ public class VistaSocios extends javax.swing.JInternalFrame {
     }
 
     private void armarTabla() {
-        
+
         modeloTabla = new DefaultTableModel() {
             @Override
             public boolean isCellEditable(int fila, int columna) {
                 return false;
             }
         };
-        
+
         modeloTabla.addColumn("ID");
         modeloTabla.addColumn("DNI");
         modeloTabla.addColumn("Apellido");
@@ -42,7 +42,7 @@ public class VistaSocios extends javax.swing.JInternalFrame {
         modeloTabla.addColumn("Teléfono");
         tablaSocios.setModel(modeloTabla);
     }
-    
+
     private void mostrarSocio(Socio s) {
         txtId.setText(String.valueOf(s.getIdSocio()));
         txtDni.setText(s.getDni());
@@ -53,7 +53,7 @@ public class VistaSocios extends javax.swing.JInternalFrame {
         txtTelefono.setText(s.getTelefono());
         chkActivo.setSelected(s.isEstado());
     }
-    
+
     public void limpiar() {
         txtId.setText("");
         txtDni.setText("");
@@ -64,18 +64,18 @@ public class VistaSocios extends javax.swing.JInternalFrame {
         txtTelefono.setText("");
         chkActivo.setSelected(false);
     }
-    
+
     private String textoONull(String texto) {
         String t = texto.trim();
         return t.isEmpty() ? null : t;
     }
-    
+
     public void cargarTabla() {
         modeloTabla.setRowCount(0);
-        
+
         try {
             for (Socio s : socioData.listarSocios()) {
-                modeloTabla.addRow(new Object[] {
+                modeloTabla.addRow(new Object[]{
                     s.getIdSocio(),
                     s.getDni(),
                     s.getApellido(),
@@ -90,7 +90,7 @@ public class VistaSocios extends javax.swing.JInternalFrame {
             JOptionPane.showMessageDialog(this, "No se pudieron cargar los socios. " + ex.getMessage());
         }
     }
-    
+
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -129,6 +129,7 @@ public class VistaSocios extends javax.swing.JInternalFrame {
         txtEdad = new javax.swing.JTextField();
         btnEditar = new javax.swing.JButton();
         btnCancelar = new javax.swing.JButton();
+        btnLimpiar = new javax.swing.JButton();
 
         setTitle("Gestión de socios");
         setPreferredSize(new java.awt.Dimension(950, 400));
@@ -425,6 +426,13 @@ public class VistaSocios extends javax.swing.JInternalFrame {
                 .addGap(8, 8, 8))
         );
 
+        btnLimpiar.setText("Limpiar");
+        btnLimpiar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnLimpiarActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -437,15 +445,23 @@ public class VistaSocios extends javax.swing.JInternalFrame {
                         .addGap(0, 192, Short.MAX_VALUE))
                     .addComponent(jScrollPane1))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(panelABM, javax.swing.GroupLayout.PREFERRED_SIZE, 247, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(panelABM, javax.swing.GroupLayout.PREFERRED_SIZE, 247, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap())
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addComponent(btnLimpiar)
+                        .addGap(134, 134, 134))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
             .addGroup(layout.createSequentialGroup()
                 .addGap(12, 12, 12)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(panelABM, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(btnLimpiar)
+                        .addGap(35, 35, 35)
+                        .addComponent(panelABM, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(panelBuscar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -470,16 +486,16 @@ public class VistaSocios extends javax.swing.JInternalFrame {
 
     private void tablaSociosMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tablaSociosMouseClicked
         int fila = tablaSocios.getSelectedRow();
-        
+
         if (fila >= 0) {
             int id = Integer.parseInt(modeloTabla.getValueAt(fila, 0).toString());
-            
+
             try {
                 Socio s = socioData.obtenerSocio(id);
                 if (s != null) {
                     mostrarSocio(s);
                 }
-            } catch(SQLException ex) {
+            } catch (SQLException ex) {
                 JOptionPane.showConfirmDialog(this, "No se pudo cargar el socio: " + ex.getMessage());
             }
         }
@@ -507,12 +523,22 @@ public class VistaSocios extends javax.swing.JInternalFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_btnCancelarActionPerformed
 
+    private void btnLimpiarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLimpiarActionPerformed
+        txtDniBuscar.setText("");
+        txtNombreBuscar.setText("");
+        txtApellidoBuscar.setText("");
+        radioTodos.setSelected(true);
+        cargarTabla();
+        limpiar();
+    }//GEN-LAST:event_btnLimpiarActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnBuscar;
     private javax.swing.JButton btnCancelar;
     private javax.swing.JButton btnEditar;
     private javax.swing.JButton btnGuardar;
+    private javax.swing.JButton btnLimpiar;
     private javax.swing.JButton btnNuevo;
     private javax.swing.JCheckBox chkActivo;
     private javax.swing.JScrollPane jScrollPane1;
