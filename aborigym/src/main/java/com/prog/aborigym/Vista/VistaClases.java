@@ -1,6 +1,7 @@
 package com.prog.aborigym.Vista;
 
 import com.prog.aborigym.Modelo.ClaseGym;
+import com.prog.aborigym.Modelo.Disciplinas;
 import com.prog.aborigym.Modelo.Entrenador;
 import com.prog.aborigym.Persistencia.ClaseGymData;
 import com.prog.aborigym.Persistencia.Conexion;
@@ -10,6 +11,7 @@ import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 import javax.swing.DefaultListCellRenderer;
+import javax.swing.JComboBox;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
@@ -23,6 +25,7 @@ public class VistaClases extends javax.swing.JInternalFrame {
     private ClaseGymData claseGymData;
     private EntrenadorData entrenadorData;
     private DefaultTableModel modeloTabla;
+    private boolean cargandoCombos;
 
     public VistaClases(Conexion con) {
         claseGymData = new ClaseGymData(con);
@@ -30,7 +33,7 @@ public class VistaClases extends javax.swing.JInternalFrame {
         initComponents();
         radioTodos.setSelected(true);
         armarTabla();
-        cargarEntrenadores();
+        prepararCombos();
         cargarTabla();
         limpiar();
         habilitarEdicion(false);
@@ -61,10 +64,17 @@ public class VistaClases extends javax.swing.JInternalFrame {
         tablaClases.getColumnModel().getColumn(5).setPreferredWidth(75);
     }
 
-    private void cargarEntrenadores() {
-        cboEntrenador.removeAllItems();
-        cboEntrenadorBuscar.removeAllItems();
-        cboEntrenadorBuscar.addItem(null);
+    private void prepararCombos() {
+        cboDisciplinaBuscar.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public java.awt.Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value == null) {
+                    setText("Todas");
+                }
+                return this;
+            }
+        });
         cboEntrenadorBuscar.setRenderer(new DefaultListCellRenderer() {
             @Override
             public java.awt.Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
@@ -76,22 +86,82 @@ public class VistaClases extends javax.swing.JInternalFrame {
             }
         });
 
+        cboDisciplina.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                if (!cargandoCombos) {
+                    cargarEntrenadoresDetalle();
+                }
+            }
+        });
+        cboDisciplinaBuscar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                if (!cargandoCombos) {
+                    cargarEntrenadoresBuscar();
+                }
+            }
+        });
+
+        cargarDisciplinas();
+        cargarEntrenadoresDetalle();
+        cargarEntrenadoresBuscar();
+    }
+
+    private void cargarDisciplinas() {
+        cargandoCombos = true;
+        cboDisciplina.removeAllItems();
+        cboDisciplinaBuscar.removeAllItems();
+        cboDisciplinaBuscar.addItem(null);
+        for (String disciplina : Disciplinas.LISTA) {
+            cboDisciplina.addItem(disciplina);
+            cboDisciplinaBuscar.addItem(disciplina);
+        }
+        cboDisciplina.setSelectedIndex(-1);
+        cboDisciplinaBuscar.setSelectedIndex(0);
+        cargandoCombos = false;
+    }
+
+    private void cargarEntrenadoresDetalle() {
+        llenarEntrenadores(cboEntrenador, (String) cboDisciplina.getSelectedItem(), false);
+    }
+
+    private void cargarEntrenadoresBuscar() {
+        llenarEntrenadores(cboEntrenadorBuscar, (String) cboDisciplinaBuscar.getSelectedItem(), true);
+    }
+
+    private void llenarEntrenadores(JComboBox<Entrenador> combo, String disciplina, boolean conTodos) {
+        Entrenador conservar = (Entrenador) combo.getSelectedItem();
+        cargandoCombos = true;
+        combo.removeAllItems();
+        if (conTodos) {
+            combo.addItem(null);
+        }
+
         try {
-            for (Entrenador e : entrenadorData.listarEntrenadores()) {
-                cboEntrenador.addItem(e);
-                cboEntrenadorBuscar.addItem(e);
+            List<Entrenador> lista;
+            if (disciplina == null || disciplina.trim().isEmpty()) {
+                lista = entrenadorData.listarEntrenadores();
+            } else {
+                lista = entrenadorData.listarEntrenadoresPorEspecialidad(disciplina);
+            }
+            for (Entrenador e : lista) {
+                combo.addItem(e);
             }
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(this, "No se pudieron cargar los entrenadores. " + ex.getMessage());
         }
 
-        cboEntrenador.setSelectedIndex(-1);
-        cboEntrenadorBuscar.setSelectedIndex(0);
+        if (conservar != null) {
+            seleccionarEntrenadorEn(combo, conservar);
+        }
+        if (combo.getSelectedIndex() < 0) {
+            combo.setSelectedIndex(conTodos && combo.getItemCount() > 0 ? 0 : -1);
+        }
+        cargandoCombos = false;
     }
 
     private void mostrarClase(ClaseGym c) {
         txtId.setText(String.valueOf(c.getIdClase()));
-        txtDisciplina.setText(c.getDisciplina());
+        seleccionarDisciplina(cboDisciplina, c.getDisciplina());
         seleccionarEntrenador(c.getEntrenador());
         if (c.getHorario() != null) {
             txtHorario.setText(c.getHorario().format(FiltroClases.HORA));
@@ -102,26 +172,45 @@ public class VistaClases extends javax.swing.JInternalFrame {
         chkActivo.setSelected(c.isEstado());
     }
 
+    private void seleccionarDisciplina(JComboBox<String> combo, String disciplina) {
+        if (disciplina == null) {
+            combo.setSelectedIndex(-1);
+            return;
+        }
+        for (int i = 0; i < combo.getItemCount(); i++) {
+            String item = combo.getItemAt(i);
+            if (item != null && item.equalsIgnoreCase(disciplina)) {
+                combo.setSelectedIndex(i);
+                return;
+            }
+        }
+        combo.setSelectedIndex(-1);
+    }
+
     private void seleccionarEntrenador(Entrenador entrenador) {
+        seleccionarEntrenadorEn(cboEntrenador, entrenador);
+    }
+
+    private void seleccionarEntrenadorEn(JComboBox<Entrenador> combo, Entrenador entrenador) {
         if (entrenador == null) {
-            cboEntrenador.setSelectedIndex(-1);
+            combo.setSelectedIndex(-1);
             return;
         }
 
-        for (int i = 0; i < cboEntrenador.getItemCount(); i++) {
-            Entrenador item = cboEntrenador.getItemAt(i);
-            if (item.getIdEntrenador() == entrenador.getIdEntrenador()) {
-                cboEntrenador.setSelectedIndex(i);
+        for (int i = 0; i < combo.getItemCount(); i++) {
+            Entrenador item = combo.getItemAt(i);
+            if (item != null && item.getIdEntrenador() == entrenador.getIdEntrenador()) {
+                combo.setSelectedIndex(i);
                 return;
             }
         }
 
-        cboEntrenador.setSelectedIndex(-1);
+        combo.setSelectedIndex(-1);
     }
 
     public void limpiar() {
         txtId.setText("");
-        txtDisciplina.setText("");
+        cboDisciplina.setSelectedIndex(-1);
         cboEntrenador.setSelectedIndex(-1);
         txtHorario.setText("");
         txtCapacidad.setText("");
@@ -164,7 +253,7 @@ public class VistaClases extends javax.swing.JInternalFrame {
 
     private void habilitarEdicion(boolean editando) {
         txtId.setEditable(false);
-        txtDisciplina.setEditable(editando);
+        cboDisciplina.setEnabled(editando);
         txtHorario.setEditable(editando);
         txtCapacidad.setEditable(editando);
         cboEntrenador.setEnabled(editando);
@@ -179,7 +268,7 @@ public class VistaClases extends javax.swing.JInternalFrame {
         tablaClases.setEnabled(!editando);
         tablaClases.setRowSelectionAllowed(!editando);
 
-        txtDisciplinaBuscar.setEditable(!editando);
+        cboDisciplinaBuscar.setEnabled(!editando);
         txtHorarioBuscar.setEditable(!editando);
         cboEntrenadorBuscar.setEnabled(!editando);
         radioTodos.setEnabled(!editando);
@@ -199,7 +288,7 @@ public class VistaClases extends javax.swing.JInternalFrame {
 
         return FiltroClases.filtrar(
                 clases,
-                txtDisciplinaBuscar.getText(),
+                (String) cboDisciplinaBuscar.getSelectedItem(),
                 (Entrenador) cboEntrenadorBuscar.getSelectedItem(),
                 horario,
                 radioActivos.isSelected(),
@@ -208,19 +297,19 @@ public class VistaClases extends javax.swing.JInternalFrame {
     }
 
     private ClaseGym leerFormulario() {
-        String disciplina = txtDisciplina.getText().trim();
-        if (disciplina.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Ingrese la disciplina.");
-            return null;
-        }
-        if (disciplina.length() > 50) {
-            JOptionPane.showMessageDialog(this, "La disciplina puede tener hasta 50 caracteres.");
+        String disciplina = (String) cboDisciplina.getSelectedItem();
+        if (disciplina == null || disciplina.trim().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Seleccione una disciplina.");
             return null;
         }
 
         Entrenador entrenador = (Entrenador) cboEntrenador.getSelectedItem();
         if (entrenador == null) {
             JOptionPane.showMessageDialog(this, "Seleccione un entrenador.");
+            return null;
+        }
+        if (entrenador.getEspecialidad() == null || !entrenador.getEspecialidad().equalsIgnoreCase(disciplina)) {
+            JOptionPane.showMessageDialog(this, "El entrenador no dicta esa disciplina.");
             return null;
         }
 
@@ -271,7 +360,7 @@ public class VistaClases extends javax.swing.JInternalFrame {
         lblID = new javax.swing.JLabel();
         txtId = new javax.swing.JTextField();
         lblDisciplina = new javax.swing.JLabel();
-        txtDisciplina = new javax.swing.JTextField();
+        cboDisciplina = new javax.swing.JComboBox<>();
         lblEntrenador = new javax.swing.JLabel();
         cboEntrenador = new javax.swing.JComboBox<>();
         lblHorario = new javax.swing.JLabel();
@@ -287,7 +376,7 @@ public class VistaClases extends javax.swing.JInternalFrame {
         lblHorario1 = new javax.swing.JLabel();
         txtHorarioBuscar = new javax.swing.JTextField();
         cboEntrenadorBuscar = new javax.swing.JComboBox<>();
-        txtDisciplinaBuscar = new javax.swing.JTextField();
+        cboDisciplinaBuscar = new javax.swing.JComboBox<>();
         btnBuscar = new javax.swing.JButton();
         radioTodos = new javax.swing.JRadioButton();
         radioActivos = new javax.swing.JRadioButton();
@@ -389,7 +478,7 @@ public class VistaClases extends javax.swing.JInternalFrame {
                                     .addComponent(cboEntrenador, 0, 260, Short.MAX_VALUE)
                                     .addComponent(txtHorario, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(txtId, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(txtDisciplina)
+                                    .addComponent(cboDisciplina, 0, 260, Short.MAX_VALUE)
                                     .addComponent(txtCapacidad, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE))))))
                 .addContainerGap(15, Short.MAX_VALUE))
         );
@@ -406,7 +495,7 @@ public class VistaClases extends javax.swing.JInternalFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(panelDetalleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lblDisciplina)
-                    .addComponent(txtDisciplina, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(cboDisciplina, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(panelDetalleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lblEntrenador)
@@ -488,7 +577,7 @@ public class VistaClases extends javax.swing.JInternalFrame {
                     .addGroup(panelBuscarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                         .addComponent(cboEntrenadorBuscar, 0, 260, Short.MAX_VALUE)
                         .addComponent(txtHorarioBuscar, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(txtDisciplinaBuscar))
+                        .addComponent(cboDisciplinaBuscar, 0, 260, Short.MAX_VALUE))
                     .addContainerGap(109, Short.MAX_VALUE)))
         );
         panelBuscarLayout.setVerticalGroup(
@@ -508,7 +597,7 @@ public class VistaClases extends javax.swing.JInternalFrame {
                     .addGap(11, 11, 11)
                     .addGroup(panelBuscarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(lblDisciplina1)
-                        .addComponent(txtDisciplinaBuscar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(cboDisciplinaBuscar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                     .addGroup(panelBuscarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(lblEntrenador1)
@@ -592,9 +681,9 @@ public class VistaClases extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_btnGuardarActionPerformed
 
     private void btnBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarActionPerformed
-        String disciplina = txtDisciplinaBuscar.getText().trim();
+        String disciplina = (String) cboDisciplinaBuscar.getSelectedItem();
         String horarioTexto = txtHorarioBuscar.getText().trim();
-        boolean hayFiltro = !disciplina.isEmpty() || !horarioTexto.isEmpty()
+        boolean hayFiltro = disciplina != null || !horarioTexto.isEmpty()
                 || cboEntrenadorBuscar.getSelectedItem() != null
                 || radioActivos.isSelected() || radioInactivos.isSelected();
 
@@ -618,7 +707,11 @@ public class VistaClases extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_btnBuscarActionPerformed
 
     private void btnNuevoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNuevoActionPerformed
+        String disciplinaFiltro = (String) cboDisciplinaBuscar.getSelectedItem();
         limpiar();
+        if (disciplinaFiltro != null) {
+            seleccionarDisciplina(cboDisciplina, disciplinaFiltro);
+        }
         chkActivo.setSelected(true);
         tablaClases.clearSelection();
         habilitarEdicion(true);
@@ -672,6 +765,8 @@ public class VistaClases extends javax.swing.JInternalFrame {
     private javax.swing.JButton btnNuevo;
     private javax.swing.ButtonGroup buttonGroupActivoFiltro;
     private javax.swing.ButtonGroup buttonGroupVacantesFiltro;
+    private javax.swing.JComboBox<String> cboDisciplina;
+    private javax.swing.JComboBox<String> cboDisciplinaBuscar;
     private javax.swing.JComboBox<Entrenador> cboEntrenador;
     private javax.swing.JComboBox<Entrenador> cboEntrenadorBuscar;
     private javax.swing.JCheckBox chkActivo;
@@ -691,8 +786,6 @@ public class VistaClases extends javax.swing.JInternalFrame {
     private javax.swing.JRadioButton radioTodos;
     private javax.swing.JTable tablaClases;
     private javax.swing.JTextField txtCapacidad;
-    private javax.swing.JTextField txtDisciplina;
-    private javax.swing.JTextField txtDisciplinaBuscar;
     private javax.swing.JTextField txtHorario;
     private javax.swing.JTextField txtHorarioBuscar;
     private javax.swing.JTextField txtId;

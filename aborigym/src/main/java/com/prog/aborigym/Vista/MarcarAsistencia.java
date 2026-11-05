@@ -6,6 +6,7 @@ package com.prog.aborigym.Vista;
 
 import com.prog.aborigym.Modelo.Asistencia;
 import com.prog.aborigym.Modelo.ClaseGym;
+import com.prog.aborigym.Modelo.Disciplinas;
 import com.prog.aborigym.Modelo.Entrenador;
 import com.prog.aborigym.Modelo.Pase;
 import com.prog.aborigym.Modelo.Socio;
@@ -54,6 +55,7 @@ public class MarcarAsistencia extends javax.swing.JInternalFrame {
     private ClaseGym claseSeleccionada;
     private LocalDate fechaValida;
     private boolean ajustandoFecha;
+    private boolean cargandoCombos;
 
     public MarcarAsistencia(Conexion con) {
         socioData = new SocioData(con);
@@ -68,7 +70,7 @@ public class MarcarAsistencia extends javax.swing.JInternalFrame {
         armarTablas();
         agruparRadios();
         prepararFecha();
-        cargarEntrenadores();
+        prepararFiltro();
         cargarClases(false);
     }
 
@@ -102,8 +104,8 @@ public class MarcarAsistencia extends javax.swing.JInternalFrame {
         modeloClases.addColumn("Disciplina");
         modeloClases.addColumn("Entrenador");
         modeloClases.addColumn("Horario");
-        modeloClases.addColumn("Capacidad");
-        modeloClases.addColumn("Libres");
+        modeloClases.addColumn("Lugares");
+        modeloClases.addColumn("Estado");
         tablaClases.setModel(modeloClases);
         tablaClases.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tablaClases.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
@@ -112,9 +114,7 @@ public class MarcarAsistencia extends javax.swing.JInternalFrame {
         tablaClases.getColumnModel().getColumn(2).setPreferredWidth(62);
         tablaClases.getColumnModel().getColumn(2).setMaxWidth(72);
         tablaClases.getColumnModel().getColumn(3).setPreferredWidth(72);
-        tablaClases.getColumnModel().getColumn(3).setMaxWidth(90);
-        tablaClases.getColumnModel().getColumn(4).setPreferredWidth(58);
-        tablaClases.getColumnModel().getColumn(4).setMaxWidth(70);
+        tablaClases.getColumnModel().getColumn(4).setPreferredWidth(75);
     }
 
     private void cargarSocios(boolean avisarSiFaltaClase) {
@@ -225,16 +225,17 @@ public class MarcarAsistencia extends javax.swing.JInternalFrame {
         }
 
         Entrenador entrenador = (Entrenador) cboEntrenadorBuscar.getSelectedItem();
+        String disciplina = (String) cboDisciplinaBuscar.getSelectedItem();
         boolean soloActivas = radioActivos.isSelected();
         boolean soloInactivas = radioInactivos.isSelected();
         List<ClaseGym> filtradas;
         List<Integer> lugaresLibres = new ArrayList<>();
         try {
             Map<Integer, Integer> cantidades = asistenciaData.contarAsistenciaClases(
-                    fecha, txtDisciplinaBuscar.getText(), entrenador, horario, soloActivas, soloInactivas);
+                    fecha, disciplina, entrenador, horario, soloActivas, soloInactivas);
             filtradas = FiltroClases.filtrar(
                     claseGymData.listarClasesGym(),
-                    txtDisciplinaBuscar.getText(),
+                    disciplina,
                     entrenador,
                     horario,
                     soloActivas,
@@ -247,7 +248,7 @@ public class MarcarAsistencia extends javax.swing.JInternalFrame {
                 if (libres < 0) {
                     libres = 0;
                 }
-                if (radioActivos1.isSelected() && libres == 0) {
+                if (radioConVacantes.isSelected() && libres == 0) {
                     continue;
                 }
                 visibles.add(c);
@@ -279,8 +280,8 @@ public class MarcarAsistencia extends javax.swing.JInternalFrame {
                 c.getDisciplina(),
                 nombreEntrenador,
                 horarioTextoFila,
-                c.getCapacidad(),
-                lugaresLibres.get(i)
+                lugaresLibres.get(i) + "/" + c.getCapacidad(),
+                c.isEstado() ? "Activo" : "Inactivo"
             });
             if (c.getIdClase() == idClase) {
                 claseSeleccionada = c;
@@ -301,7 +302,7 @@ public class MarcarAsistencia extends javax.swing.JInternalFrame {
         estado.add(radioInactivos);
 
         ButtonGroup vacantes = new ButtonGroup();
-        vacantes.add(radioActivos1);
+        vacantes.add(radioConVacantes);
         vacantes.add(radioTodos1);
     }
 
@@ -353,9 +354,17 @@ public class MarcarAsistencia extends javax.swing.JInternalFrame {
         return valor.toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate();
     }
 
-    private void cargarEntrenadores() {
-        cboEntrenadorBuscar.removeAllItems();
-        cboEntrenadorBuscar.addItem(null);
+    private void prepararFiltro() {
+        cboDisciplinaBuscar.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public java.awt.Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value == null) {
+                    setText("Todas");
+                }
+                return this;
+            }
+        });
         cboEntrenadorBuscar.setRenderer(new DefaultListCellRenderer() {
             @Override
             public java.awt.Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
@@ -366,15 +375,66 @@ public class MarcarAsistencia extends javax.swing.JInternalFrame {
                 return this;
             }
         });
+        cboDisciplinaBuscar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                if (!cargandoCombos) {
+                    cargarEntrenadores();
+                }
+            }
+        });
+
+        cargandoCombos = true;
+        cboDisciplinaBuscar.removeAllItems();
+        cboDisciplinaBuscar.addItem(null);
+        for (String disciplina : Disciplinas.LISTA) {
+            cboDisciplinaBuscar.addItem(disciplina);
+        }
+        cboDisciplinaBuscar.setSelectedIndex(0);
+        cargandoCombos = false;
+        cargarEntrenadores();
+    }
+
+    private void cargarEntrenadores() {
+        Entrenador conservar = (Entrenador) cboEntrenadorBuscar.getSelectedItem();
+        String disciplina = (String) cboDisciplinaBuscar.getSelectedItem();
+        cargandoCombos = true;
+        cboEntrenadorBuscar.removeAllItems();
+        cboEntrenadorBuscar.addItem(null);
 
         try {
-            for (Entrenador e : entrenadorData.listarEntrenadores()) {
+            List<Entrenador> lista;
+            if (disciplina == null || disciplina.trim().isEmpty()) {
+                lista = entrenadorData.listarEntrenadores();
+            } else {
+                lista = entrenadorData.listarEntrenadoresPorEspecialidad(disciplina);
+            }
+            for (Entrenador e : lista) {
                 cboEntrenadorBuscar.addItem(e);
             }
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(this, "No se pudieron cargar los entrenadores. " + ex.getMessage());
         }
-        cboEntrenadorBuscar.setSelectedIndex(0);
+
+        seleccionarEntrenador(conservar);
+        if (cboEntrenadorBuscar.getSelectedIndex() < 0 && cboEntrenadorBuscar.getItemCount() > 0) {
+            cboEntrenadorBuscar.setSelectedIndex(0);
+        }
+        cargandoCombos = false;
+    }
+
+    private void seleccionarEntrenador(Entrenador entrenador) {
+        if (entrenador == null) {
+            cboEntrenadorBuscar.setSelectedIndex(-1);
+            return;
+        }
+        for (int i = 0; i < cboEntrenadorBuscar.getItemCount(); i++) {
+            Entrenador item = cboEntrenadorBuscar.getItemAt(i);
+            if (item != null && item.getIdEntrenador() == entrenador.getIdEntrenador()) {
+                cboEntrenadorBuscar.setSelectedIndex(i);
+                return;
+            }
+        }
+        cboEntrenadorBuscar.setSelectedIndex(-1);
     }
 
     private boolean coincideSocio(Socio socio, String texto) {
@@ -413,12 +473,12 @@ public class MarcarAsistencia extends javax.swing.JInternalFrame {
         lblHorario1 = new javax.swing.JLabel();
         txtHorarioBuscar = new javax.swing.JTextField();
         cboEntrenadorBuscar = new javax.swing.JComboBox<>();
-        txtDisciplinaBuscar = new javax.swing.JTextField();
+        cboDisciplinaBuscar = new javax.swing.JComboBox<>();
         btnBuscar = new javax.swing.JButton();
         radioTodos = new javax.swing.JRadioButton();
         radioActivos = new javax.swing.JRadioButton();
         radioInactivos = new javax.swing.JRadioButton();
-        radioActivos1 = new javax.swing.JRadioButton();
+        radioConVacantes = new javax.swing.JRadioButton();
         radioTodos1 = new javax.swing.JRadioButton();
         lblTituloSocios1 = new javax.swing.JLabel();
         lblTituloSocios2 = new javax.swing.JLabel();
@@ -529,11 +589,11 @@ public class MarcarAsistencia extends javax.swing.JInternalFrame {
 
         radioInactivos.setText("Inactivas");
 
-        radioActivos1.setSelected(true);
-        radioActivos1.setText("Solo con vacantes");
-        radioActivos1.addActionListener(new java.awt.event.ActionListener() {
+        radioConVacantes.setSelected(true);
+        radioConVacantes.setText("Solo con vacantes");
+        radioConVacantes.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                radioActivos1ActionPerformed(evt);
+                radioConVacantesActionPerformed(evt);
             }
         });
 
@@ -548,7 +608,7 @@ public class MarcarAsistencia extends javax.swing.JInternalFrame {
                 .addGroup(panelBuscarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(btnBuscar, javax.swing.GroupLayout.PREFERRED_SIZE, 116, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(panelBuscarLayout.createSequentialGroup()
-                        .addComponent(radioActivos1)
+                        .addComponent(radioConVacantes)
                         .addGap(18, 18, 18)
                         .addComponent(radioTodos1, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(panelBuscarLayout.createSequentialGroup()
@@ -568,7 +628,7 @@ public class MarcarAsistencia extends javax.swing.JInternalFrame {
                     .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                     .addGroup(panelBuscarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                         .addComponent(cboEntrenadorBuscar, 0, 260, Short.MAX_VALUE)
-                        .addComponent(txtDisciplinaBuscar)
+                        .addComponent(cboDisciplinaBuscar, 0, 260, Short.MAX_VALUE)
                         .addComponent(txtHorarioBuscar, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addContainerGap(7, Short.MAX_VALUE)))
         );
@@ -582,7 +642,7 @@ public class MarcarAsistencia extends javax.swing.JInternalFrame {
                     .addComponent(radioInactivos))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(panelBuscarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(radioActivos1)
+                    .addComponent(radioConVacantes)
                     .addComponent(radioTodos1))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(btnBuscar)
@@ -592,7 +652,7 @@ public class MarcarAsistencia extends javax.swing.JInternalFrame {
                     .addGap(11, 11, 11)
                     .addGroup(panelBuscarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(lblDisciplina1)
-                        .addComponent(txtDisciplinaBuscar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(cboDisciplinaBuscar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                     .addGroup(panelBuscarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(lblEntrenador1)
@@ -778,9 +838,9 @@ public class MarcarAsistencia extends javax.swing.JInternalFrame {
         cargarClases(true);
     }//GEN-LAST:event_btnBuscarActionPerformed
 
-    private void radioActivos1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_radioActivos1ActionPerformed
+    private void radioConVacantesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_radioConVacantesActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_radioActivos1ActionPerformed
+    }//GEN-LAST:event_radioConVacantesActionPerformed
 
     private void txtHorarioBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtHorarioBuscarActionPerformed
         // TODO add your handling code here:
@@ -832,6 +892,7 @@ public class MarcarAsistencia extends javax.swing.JInternalFrame {
     private javax.swing.JButton btnBuscarSocio;
     private javax.swing.JButton btnMarcar;
     private javax.swing.JButton btnMarcar1;
+    private javax.swing.JComboBox<String> cboDisciplinaBuscar;
     private javax.swing.JComboBox<Entrenador> cboEntrenadorBuscar;
     private javax.swing.JScrollPane jScrollPaneClases;
     private javax.swing.JScrollPane jScrollPaneSocios;
@@ -845,7 +906,7 @@ public class MarcarAsistencia extends javax.swing.JInternalFrame {
     private javax.swing.JLabel lblTituloSocios2;
     private javax.swing.JPanel panelBuscar;
     private javax.swing.JRadioButton radioActivos;
-    private javax.swing.JRadioButton radioActivos1;
+    private javax.swing.JRadioButton radioConVacantes;
     private javax.swing.JRadioButton radioInactivos;
     private javax.swing.JRadioButton radioTodos;
     private javax.swing.JRadioButton radioTodos1;
@@ -853,7 +914,6 @@ public class MarcarAsistencia extends javax.swing.JInternalFrame {
     private javax.swing.JTable tablaClases;
     private javax.swing.JTable tablaSocios;
     private javax.swing.JTextField txtBuscarSocio;
-    private javax.swing.JTextField txtDisciplinaBuscar;
     private javax.swing.JTextField txtHorarioBuscar;
     // End of variables declaration//GEN-END:variables
 }

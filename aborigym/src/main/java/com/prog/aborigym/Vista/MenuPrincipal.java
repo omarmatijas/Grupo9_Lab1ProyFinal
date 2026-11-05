@@ -23,6 +23,7 @@ public class MenuPrincipal extends javax.swing.JFrame {
     private VistaClases vistaClases;
     private VistaPases vistaPases;
     private MarcarAsistencia vistaMarcarAsistencia;
+    private ConsultarAsistencia vistaConsultarAsistencia;
 
     private static final java.awt.Dimension TAMANIO_VENTANA = new java.awt.Dimension(980, 500);
 
@@ -105,6 +106,7 @@ public class MenuPrincipal extends javax.swing.JFrame {
         gestionClases = new javax.swing.JMenuItem();
         menuAsistencia = new javax.swing.JMenu();
         marcarAsistencia = new javax.swing.JMenuItem();
+        consultarAsistencia = new javax.swing.JMenuItem();
         menuOpciones = new javax.swing.JMenu();
         salir = new javax.swing.JMenuItem();
 
@@ -183,6 +185,14 @@ public class MenuPrincipal extends javax.swing.JFrame {
         });
         menuAsistencia.add(marcarAsistencia);
 
+        consultarAsistencia.setText("Consultar asistencia");
+        consultarAsistencia.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                consultarAsistenciaActionPerformed(evt);
+            }
+        });
+        menuAsistencia.add(consultarAsistencia);
+
         menuBar.add(menuAsistencia);
 
         menuOpciones.setText("Opciones");
@@ -253,6 +263,12 @@ public class MenuPrincipal extends javax.swing.JFrame {
         mostrar(vistaMarcarAsistencia);
     }//GEN-LAST:event_marcarAsistenciaActionPerformed
 
+    private void consultarAsistenciaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_consultarAsistenciaActionPerformed
+        if (vistaConsultarAsistencia == null || vistaConsultarAsistencia.isClosed()) {
+            vistaConsultarAsistencia = new ConsultarAsistencia(con);
+        }
+        mostrar(vistaConsultarAsistencia);    }//GEN-LAST:event_consultarAsistenciaActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -289,6 +305,7 @@ public class MenuPrincipal extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JMenuItem consultarAsistencia;
     private javax.swing.JDesktopPane escritorio;
     private javax.swing.JMenuItem gestionClases;
     private javax.swing.JMenuItem gestionEntrenadores;

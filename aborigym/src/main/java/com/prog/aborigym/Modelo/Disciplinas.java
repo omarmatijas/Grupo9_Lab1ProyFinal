@@ -10,7 +10,16 @@ package com.prog.aborigym.Modelo;
  */
 public class Disciplinas {
     public static final String[] LISTA = {
-        "Pilates",  "Spinning", "CrossFit", "Musculacion","Funcional", "Yoga", "Gap"};
+        "Pilates",
+        "Spinning",
+        "CrossFit",
+        "Musculación",
+        "Funcional",
+        "Yoga",
+        "Gap",
+        "Boxeo",
+        "Zumba"
+    };
     
     private Disciplinas(){
         

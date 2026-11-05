@@ -230,7 +230,7 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Component id="btnBuscar" min="-2" pref="116" max="-2" attributes="0"/>
                       <Group type="102" attributes="0">
-                          <Component id="radioActivos1" min="-2" max="-2" attributes="0"/>
+                          <Component id="radioConVacantes" min="-2" max="-2" attributes="0"/>
                           <EmptySpace type="separate" max="-2" attributes="0"/>
                           <Component id="radioTodos1" min="-2" pref="70" max="-2" attributes="0"/>
                       </Group>
@@ -255,7 +255,7 @@
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" max="-2" attributes="0">
                           <Component id="cboEntrenadorBuscar" alignment="0" pref="260" max="32767" attributes="0"/>
-                          <Component id="txtDisciplinaBuscar" alignment="0" max="32767" attributes="0"/>
+                          <Component id="cboDisciplinaBuscar" alignment="0" pref="260" max="32767" attributes="0"/>
                           <Component id="txtHorarioBuscar" alignment="0" min="-2" pref="113" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace pref="7" max="32767" attributes="0"/>
@@ -274,7 +274,7 @@
                   </Group>
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
-                      <Component id="radioActivos1" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="radioConVacantes" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="radioTodos1" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
@@ -286,7 +286,7 @@
                       <EmptySpace min="-2" pref="11" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
                           <Component id="lblDisciplina1" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="txtDisciplinaBuscar" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="cboDisciplinaBuscar" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
@@ -341,7 +341,15 @@
             <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;Entrenador&gt;"/>
           </AuxValues>
         </Component>
-        <Component class="javax.swing.JTextField" name="txtDisciplinaBuscar">
+        <Component class="javax.swing.JComboBox" name="cboDisciplinaBuscar">
+          <Properties>
+            <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
+              <StringArray count="0"/>
+            </Property>
+          </Properties>
+          <AuxValues>
+            <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
+          </AuxValues>
         </Component>
         <Component class="javax.swing.JButton" name="btnBuscar">
           <Properties>
@@ -370,13 +378,13 @@
             <Property name="text" type="java.lang.String" value="Inactivas"/>
           </Properties>
         </Component>
-        <Component class="javax.swing.JRadioButton" name="radioActivos1">
+        <Component class="javax.swing.JRadioButton" name="radioConVacantes">
           <Properties>
             <Property name="selected" type="boolean" value="true"/>
             <Property name="text" type="java.lang.String" value="Solo con vacantes"/>
           </Properties>
           <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="radioActivos1ActionPerformed"/>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="radioConVacantesActionPerformed"/>
           </Events>
         </Component>
         <Component class="javax.swing.JRadioButton" name="radioTodos1">
