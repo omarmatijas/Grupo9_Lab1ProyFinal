@@ -31,7 +31,7 @@ public class FiltroClases {
     }
 
     public static List<ClaseGym> filtrar(List<ClaseGym> clases, String disciplina, Entrenador entrenador,
-            LocalTime horario, boolean soloActivas, boolean soloInactivas) {
+        LocalTime horario, boolean soloActivas, boolean soloInactivas) {
         String texto = disciplina == null ? "" : disciplina.trim().toLowerCase();
         List<ClaseGym> filtradas = new ArrayList<>();
 

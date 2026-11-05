@@ -4,6 +4,8 @@ import com.prog.aborigym.Modelo.Socio;
 import com.prog.aborigym.Persistencia.Conexion;
 import com.prog.aborigym.Persistencia.SocioData;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
@@ -71,11 +73,19 @@ public class VistaSocios extends javax.swing.JInternalFrame {
     }
 
     public void cargarTabla() {
+        try {
+            llenarTabla(socioData.listarSocios());
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(this, "No se pudieron cargar las clases. " + ex.getMessage());
+        }
+    }
+    
+    public void llenarTabla(List<Socio> socios) {
         modeloTabla.setRowCount(0);
 
         try {
-            for (Socio s : socioData.listarSocios()) {
-                modeloTabla.addRow(new Object[]{
+            for (Socio s : socios) {
+                modeloTabla.addRow(new Object[] {
                     s.getIdSocio(),
                     s.getDni(),
                     s.getApellido(),
@@ -86,7 +96,7 @@ public class VistaSocios extends javax.swing.JInternalFrame {
                     s.isEstado() ? "Activo" : "Inactivo"
                 });
             }
-        } catch (SQLException ex) {
+        } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, "No se pudieron cargar los socios. " + ex.getMessage());
         }
     }
@@ -95,6 +105,7 @@ public class VistaSocios extends javax.swing.JInternalFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        btnGrpActivar = new javax.swing.ButtonGroup();
         jScrollPane1 = new javax.swing.JScrollPane();
         tablaSocios = new javax.swing.JTable();
         panelBuscar = new javax.swing.JPanel();
@@ -166,21 +177,17 @@ public class VistaSocios extends javax.swing.JInternalFrame {
         lblDniBuscar.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         lblDniBuscar.setText("DNI");
 
-        txtDniBuscar.setEditable(false);
-
         lblNombreBuscar.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         lblNombreBuscar.setText("Nombre");
-
-        txtNombreBuscar.setEditable(false);
 
         lblApellidoBuscar.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         lblApellidoBuscar.setText("Apellido");
 
-        txtApellidoBuscar.setEditable(false);
-
+        btnGrpActivar.add(radioTodos);
         radioTodos.setSelected(true);
         radioTodos.setText("Todos");
 
+        btnGrpActivar.add(radioActivos);
         radioActivos.setText("Activos");
         radioActivos.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -188,6 +195,7 @@ public class VistaSocios extends javax.swing.JInternalFrame {
             }
         });
 
+        btnGrpActivar.add(radioInactivos);
         radioInactivos.setText("Inactivos");
 
         javax.swing.GroupLayout panelBuscarLayout = new javax.swing.GroupLayout(panelBuscar);
@@ -333,7 +341,7 @@ public class VistaSocios extends javax.swing.JInternalFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(panelABMLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(panelABMLayout.createSequentialGroup()
-                        .addGroup(panelABMLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                        .addGroup(panelABMLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                             .addGroup(panelABMLayout.createSequentialGroup()
                                 .addGroup(panelABMLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                                     .addComponent(lblID, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -359,13 +367,10 @@ public class VistaSocios extends javax.swing.JInternalFrame {
                                         .addGroup(panelABMLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                             .addComponent(txtId, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
                                             .addComponent(txtDni, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)))))
-                            .addGroup(panelABMLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelABMLayout.createSequentialGroup()
-                                    .addGap(40, 40, 40)
-                                    .addComponent(btnNuevo, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGroup(panelABMLayout.createSequentialGroup()
-                                    .addComponent(btnEditar, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 101, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                            .addGroup(panelABMLayout.createSequentialGroup()
+                                .addComponent(btnEditar, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(btnNuevo, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addGap(113, 113, 113))
                     .addGroup(panelABMLayout.createSequentialGroup()
                         .addComponent(btnCancelar, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -477,7 +482,26 @@ public class VistaSocios extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_txtTelefonoActionPerformed
 
     private void btnBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarActionPerformed
-        // TODO add your handling code here:
+        String dni = (String) txtDniBuscar.getText().trim();
+        String apellido = txtApellidoBuscar.getText().trim();
+        String nombre = txtNombreBuscar.getText().trim();
+        
+        boolean hayFiltro = !dni.isEmpty() || !apellido.isEmpty() || !nombre.isEmpty()
+                || radioActivos.isSelected() || radioInactivos.isSelected();
+        
+        try {
+            List<Socio> socios = filtrar(socioData.listarSocios(), dni, nombre, 
+                apellido, radioActivos.isSelected(), radioInactivos.isSelected());
+            
+            if (socios == null) {
+                return;
+            }
+            
+            llenarTabla(socios);
+            
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(this, "No se pudo buscar. " + ex.getMessage());
+        }
     }//GEN-LAST:event_btnBuscarActionPerformed
 
     private void chkActivoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkActivoActionPerformed
@@ -501,6 +525,49 @@ public class VistaSocios extends javax.swing.JInternalFrame {
         }
     }//GEN-LAST:event_tablaSociosMouseClicked
 
+    public static List<Socio> filtrar(List<Socio> socios, String dni, String nombre,
+        String apellido, boolean soloActivas, boolean soloInactivas) {
+        
+        String textoDni = dni == null ? "" : dni.trim().toLowerCase();
+        String textoNombre = nombre == null ? "" : nombre.trim().toLowerCase();
+        String textoApellido = apellido == null ? "" : apellido.trim().toLowerCase();
+        
+        List<Socio> filtradas = new ArrayList<>();
+
+        for (Socio s : socios) {
+            if (soloActivas && !s.isEstado()) {
+                continue;
+            }
+            if (soloInactivas && s.isEstado()) {
+                continue;
+            }
+            if (!textoDni.isEmpty()) {
+                String dniSocio = s.getDni() == null ? "" : s.getDni();
+                if (!dniSocio.contains(textoDni)) {
+                    continue;
+                }
+            }
+            
+            if (!textoNombre.isEmpty()) {
+                String nombreSocio = s.getNombre() == null ? "" : s.getNombre();
+                if (!nombreSocio.toLowerCase().contains(textoNombre)) {
+                    continue;
+                }
+            }
+            
+            if (!textoApellido.isEmpty()) {
+                String apellidoSocio = s.getApellido()== null ? "" : s.getApellido();
+                if (!apellidoSocio.toLowerCase().contains(textoApellido)) {
+                    continue;
+                }
+            }
+            filtradas.add(s);
+        }
+
+        //ordenar(filtradas);
+        return filtradas;
+    }
+    
     private void btnNuevoMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnNuevoMouseClicked
         // TODO add your handling code here:
         limpiar();
@@ -537,6 +604,7 @@ public class VistaSocios extends javax.swing.JInternalFrame {
     private javax.swing.JButton btnBuscar;
     private javax.swing.JButton btnCancelar;
     private javax.swing.JButton btnEditar;
+    private javax.swing.ButtonGroup btnGrpActivar;
     private javax.swing.JButton btnGuardar;
     private javax.swing.JButton btnLimpiar;
     private javax.swing.JButton btnNuevo;
