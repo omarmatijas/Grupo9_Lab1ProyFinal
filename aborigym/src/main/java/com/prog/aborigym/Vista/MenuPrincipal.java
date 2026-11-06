@@ -11,7 +11,7 @@ import javax.swing.JOptionPane;
 public class MenuPrincipal extends javax.swing.JFrame {
 
     private static final String HOST = "localhost";
-    private static final String PORT = "3306";
+    private static final String[] PUERTOS = {"3306", "3307"};
     private static final String DB_NAME = "grupo9_aborigym";
     private static final String USER = "root";
     private static final String PASSWORD = "";
@@ -44,15 +44,16 @@ public class MenuPrincipal extends javax.swing.JFrame {
     }
 
     private void iniciarConexion() throws SQLException {
-        String url = "jdbc:mariadb://" + HOST + ":" + PORT + "/" + DB_NAME;
-        con = new Conexion(
-                url,
-                USER,
-                PASSWORD
-        );
-        if (con.buscarConexion() == null) {
-            throw new SQLException("No se pudo conectar a " + url);
+        for (String puerto : PUERTOS) {
+            String url = "jdbc:mariadb://" + HOST + ":" + puerto + "/" + DB_NAME;
+            Conexion intento = new Conexion(url, USER, PASSWORD);
+            if (intento.buscarConexion() != null) {
+                con = intento;          // conectó: nos quedamos con esta
+                return;                 // y no probamos el siguiente puerto
+            }
         }
+        throw new SQLException("No se pudo conectar a la base " + DB_NAME
+                + " en los puertos " + String.join(" ni ", PUERTOS) + ".");
     }
 
     private void mostrar(javax.swing.JInternalFrame ventana) {
