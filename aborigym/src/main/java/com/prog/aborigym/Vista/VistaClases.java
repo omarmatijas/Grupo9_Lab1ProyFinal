@@ -381,6 +381,7 @@ public class VistaClases extends javax.swing.JInternalFrame {
         radioTodos = new javax.swing.JRadioButton();
         radioActivos = new javax.swing.JRadioButton();
         radioInactivos = new javax.swing.JRadioButton();
+        btnLimpiar = new javax.swing.JButton();
         btnEditar = new javax.swing.JButton();
 
         setClosable(true);
@@ -551,21 +552,29 @@ public class VistaClases extends javax.swing.JInternalFrame {
         buttonGroupActivoFiltro.add(radioInactivos);
         radioInactivos.setText("Inactivas");
 
+        btnLimpiar.setText("Limpiar");
+        btnLimpiar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnLimpiarActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout panelBuscarLayout = new javax.swing.GroupLayout(panelBuscar);
         panelBuscar.setLayout(panelBuscarLayout);
         panelBuscarLayout.setHorizontalGroup(
             panelBuscarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelBuscarLayout.createSequentialGroup()
-                .addContainerGap(318, Short.MAX_VALUE)
+                .addContainerGap(253, Short.MAX_VALUE)
                 .addGroup(panelBuscarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(panelBuscarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addComponent(radioTodos, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(radioActivos)
                         .addComponent(radioInactivos))
                     .addGroup(panelBuscarLayout.createSequentialGroup()
-                        .addComponent(btnBuscar, javax.swing.GroupLayout.PREFERRED_SIZE, 116, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(2, 2, 2)))
-                .addContainerGap())
+                        .addComponent(btnLimpiar)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(btnBuscar, javax.swing.GroupLayout.PREFERRED_SIZE, 82, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(25, 25, 25))
             .addGroup(panelBuscarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(panelBuscarLayout.createSequentialGroup()
                     .addContainerGap()
@@ -580,17 +589,22 @@ public class VistaClases extends javax.swing.JInternalFrame {
                         .addComponent(cboDisciplinaBuscar, 0, 260, Short.MAX_VALUE))
                     .addContainerGap(109, Short.MAX_VALUE)))
         );
+
+        panelBuscarLayout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {btnBuscar, btnLimpiar});
+
         panelBuscarLayout.setVerticalGroup(
             panelBuscarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelBuscarLayout.createSequentialGroup()
-                .addContainerGap(26, Short.MAX_VALUE)
+                .addContainerGap(20, Short.MAX_VALUE)
                 .addComponent(radioTodos)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(radioActivos)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(radioInactivos)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(btnBuscar)
+                .addGap(18, 18, 18)
+                .addGroup(panelBuscarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnBuscar)
+                    .addComponent(btnLimpiar))
                 .addContainerGap())
             .addGroup(panelBuscarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(panelBuscarLayout.createSequentialGroup()
@@ -741,6 +755,7 @@ public class VistaClases extends javax.swing.JInternalFrame {
 
     private void btnCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelarActionPerformed
         limpiar();
+        chkActivo.setSelected(true);
         tablaClases.clearSelection();
         habilitarEdicion(false);
     }//GEN-LAST:event_btnCancelarActionPerformed
@@ -757,11 +772,20 @@ public class VistaClases extends javax.swing.JInternalFrame {
         habilitarEdicion(true);
     }//GEN-LAST:event_btnEditarActionPerformed
 
+    private void btnLimpiarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLimpiarActionPerformed
+        cboDisciplinaBuscar.setSelectedIndex(-1);
+        cboEntrenadorBuscar.setSelectedIndex(-1);
+        txtHorarioBuscar.setText("");
+        radioTodos.setSelected(true);
+        cargarTabla();
+    }//GEN-LAST:event_btnLimpiarActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnBuscar;
     private javax.swing.JButton btnCancelar;
     private javax.swing.JButton btnEditar;
     private javax.swing.JButton btnGuardar;
+    private javax.swing.JButton btnLimpiar;
     private javax.swing.JButton btnNuevo;
     private javax.swing.ButtonGroup buttonGroupActivoFiltro;
     private javax.swing.ButtonGroup buttonGroupVacantesFiltro;
