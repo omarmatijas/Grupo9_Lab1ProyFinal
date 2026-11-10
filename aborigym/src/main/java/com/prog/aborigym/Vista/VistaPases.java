@@ -131,18 +131,23 @@ public class VistaPases extends javax.swing.JInternalFrame {
                 if (ajustandoFecha) {
                     return;
                 }
-                if (spnFechaInicio.getValue() instanceof java.util.Date) {
-                    ponerFecha(spnFechaFin, leerFecha(spnFechaInicio).plusDays(30));
+                if (!Validaciones.revisarFecha(VistaPases.this, spnFechaInicio, "La fecha de inicio")) {
+                    return;
                 }
+                ponerFecha(spnFechaFin, leerFecha(spnFechaInicio).plusDays(30));
                 refrescarEstado();
             }
         });
         spnFechaFin.addChangeListener(new javax.swing.event.ChangeListener() {
             @Override
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
-                if (!ajustandoFecha) {
-                    refrescarEstado();
+                if (ajustandoFecha) {
+                    return;
                 }
+                if (!Validaciones.revisarFecha(VistaPases.this, spnFechaFin, "La fecha de fin")) {
+                    return;
+                }
+                refrescarEstado();
             }
         });
         txtEntradasDisponibles.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
@@ -270,7 +275,9 @@ public class VistaPases extends javax.swing.JInternalFrame {
         boolean nuevo = idTexto.isEmpty();
         String error = validarFormulario(nuevo);
         if (error != null) {
-            JOptionPane.showMessageDialog(this, error);
+            if (!error.isEmpty()) {
+                JOptionPane.showMessageDialog(this, error);
+            }
             return null;
         }
 
@@ -316,22 +323,12 @@ public class VistaPases extends javax.swing.JInternalFrame {
             return "Un pase nuevo tiene 8, 12 o 20 entradas.";
         }
 
-        String precioTexto = txtPrecio.getText().trim();
-        if (precioTexto.isEmpty()) {
-            return "Ingrese el precio abonado.";
+        if (!Validaciones.revisarPrecio(this, txtPrecio)) {
+            return "";
         }
-        try {
-            double costo = Double.parseDouble(precioTexto.replace(',', '.'));
-            if (costo < 0) {
-                return "El precio no puede ser negativo.";
-            }
-        } catch (NumberFormatException ex) {
-            return "El precio debe ser un número.";
-        }
-
-        if (!(spnFechaInicio.getValue() instanceof java.util.Date)
-                || !(spnFechaFin.getValue() instanceof java.util.Date)) {
-            return "Ingrese la fecha de inicio y la de fin.";
+        if (!Validaciones.revisarFecha(this, spnFechaInicio, "La fecha de inicio")
+                || !Validaciones.revisarFecha(this, spnFechaFin, "La fecha de fin")) {
+            return "";
         }
         LocalDate inicio = leerFecha(spnFechaInicio);
         LocalDate fin = leerFecha(spnFechaFin);
@@ -596,6 +593,12 @@ public class VistaPases extends javax.swing.JInternalFrame {
         });
 
         lblPrecio.setText("Precio abonado");
+
+        txtPrecio.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtPrecioActionPerformed(evt);
+            }
+        });
 
         txtEntradasUtilizadas.setEditable(false);
 
@@ -897,11 +900,21 @@ public class VistaPases extends javax.swing.JInternalFrame {
         habilitarEdicion(true);
     }//GEN-LAST:event_btnNuevoActionPerformed
 
+    private void txtPrecioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtPrecioActionPerformed
+        Validaciones.revisarPrecio(this, txtPrecio);
+    }//GEN-LAST:event_txtPrecioActionPerformed
+
     private void txtBuscarSocioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtBuscarSocioActionPerformed
+        if (!Validaciones.revisarBusqueda(this, txtBuscarSocio)) {
+            return;
+        }
         cargarSocios(true);
     }//GEN-LAST:event_txtBuscarSocioActionPerformed
 
     private void btnBuscarSocioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarSocioActionPerformed
+        if (!Validaciones.revisarBusqueda(this, txtBuscarSocio)) {
+            return;
+        }
         cargarSocios(true);
     }//GEN-LAST:event_btnBuscarSocioActionPerformed
 

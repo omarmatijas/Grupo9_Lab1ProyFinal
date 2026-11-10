@@ -318,6 +318,24 @@ public class VistaEntrenadores extends javax.swing.JInternalFrame {
 
         lblID.setText("ID");
 
+        txtDni.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtDniActionPerformed(evt);
+            }
+        });
+
+        txtNombre.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtNombreActionPerformed(evt);
+            }
+        });
+
+        txtApellido.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtApellidoActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -538,7 +556,22 @@ public class VistaEntrenadores extends javax.swing.JInternalFrame {
     }// </editor-fold>//GEN-END:initComponents
     
 
+    private void txtDniActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtDniActionPerformed
+        Validaciones.revisarDni(this, txtDni);
+    }//GEN-LAST:event_txtDniActionPerformed
+
+    private void txtNombreActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtNombreActionPerformed
+        Validaciones.revisarLetras(this, txtNombre, "El nombre");
+    }//GEN-LAST:event_txtNombreActionPerformed
+
+    private void txtApellidoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtApellidoActionPerformed
+        Validaciones.revisarLetras(this, txtApellido, "El apellido");
+    }//GEN-LAST:event_txtApellidoActionPerformed
+
     private void btnGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarActionPerformed
+        if (!Validaciones.revisarDni(this, txtDni) || !Validaciones.revisarLetras(this, txtNombre, "El nombre") || !Validaciones.revisarLetras(this, txtApellido, "El apellido")) {
+            return;
+        }
         String dni = txtDni.getText().trim();
         if (!dni.matches("\\d{7,8}")) {
             JOptionPane.showMessageDialog(this, "El DNI debe tener 7 u 8 números.");
@@ -548,10 +581,6 @@ public class VistaEntrenadores extends javax.swing.JInternalFrame {
         String apellido = txtApellido.getText().trim();
         if (nombre.isEmpty() || apellido.isEmpty()) {
             JOptionPane.showMessageDialog(this, "El nombre y el apellido son obligatorios.");
-            return;
-        }
-        if (nombre.length() > 50 || apellido.length() > 50) {
-            JOptionPane.showMessageDialog(this, "El nombre y el apellido no pueden superar los 50 caracteres.");
             return;
         }
         String especialidad = (String) cboEspecialidad.getSelectedItem();
@@ -615,6 +644,9 @@ public class VistaEntrenadores extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_chkActivoActionPerformed
 
     private void btnBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarActionPerformed
+        if (!Validaciones.revisarBusqueda(this, txtBuscarEntrenador)) {
+            return;
+        }
         actualizarTabla(true);
         limpiar();
         habilitarEdicion(false);
@@ -640,6 +672,9 @@ public class VistaEntrenadores extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_tablaEntrenadoresMouseClicked
 
     private void txtBuscarEntrenadorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtBuscarEntrenadorActionPerformed
+        if (!Validaciones.revisarBusqueda(this, txtBuscarEntrenador)) {
+            return;
+        }
         actualizarTabla(true);
         limpiar();
         habilitarEdicion(false);

@@ -19,7 +19,6 @@ import com.prog.aborigym.Persistencia.SocioData;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -208,11 +207,13 @@ public class MarcarAsistencia extends javax.swing.JInternalFrame {
     }
 
     private void cargarClases(boolean avisarSiVacio) {
-        LocalTime horario;
-        try {
-            horario = FiltroClases.leerHorario(txtHorarioBuscar.getText());
-        } catch (DateTimeParseException ex) {
-            JOptionPane.showMessageDialog(this, FiltroClases.MENSAJE_HORARIO);
+        String textoHorario = txtHorarioBuscar.getText().trim();
+        LocalTime horario = Validaciones.leerHorario(this, txtHorarioBuscar, false);
+        if (!textoHorario.isEmpty() && horario == null) {
+            return;
+        }
+        if (!Validaciones.revisarFecha(this, spnFecha, "La fecha")) {
+            ponerFecha(fechaValida);
             return;
         }
 
@@ -312,6 +313,10 @@ public class MarcarAsistencia extends javax.swing.JInternalFrame {
         spnFecha.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
                 if (ajustandoFecha) {
+                    return;
+                }
+                if (!Validaciones.revisarFecha(MarcarAsistencia.this, spnFecha, "La fecha")) {
+                    ponerFecha(fechaValida);
                     return;
                 }
                 LocalDate fecha = fechaElegida();
@@ -755,10 +760,16 @@ public class MarcarAsistencia extends javax.swing.JInternalFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void txtBuscarSocioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtBuscarSocioActionPerformed
+        if (!Validaciones.revisarBusqueda(this, txtBuscarSocio)) {
+            return;
+        }
         cargarSocios(true);
     }//GEN-LAST:event_txtBuscarSocioActionPerformed
 
     private void btnBuscarSocioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarSocioActionPerformed
+        if (!Validaciones.revisarBusqueda(this, txtBuscarSocio)) {
+            return;
+        }
         cargarSocios(true);
     }//GEN-LAST:event_btnBuscarSocioActionPerformed
 
@@ -843,7 +854,11 @@ public class MarcarAsistencia extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_radioConVacantesActionPerformed
 
     private void txtHorarioBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtHorarioBuscarActionPerformed
-        // TODO add your handling code here:
+        String texto = txtHorarioBuscar.getText().trim();
+        LocalTime horario = Validaciones.leerHorario(this, txtHorarioBuscar, false);
+        if (!texto.isEmpty() && horario == null) {
+            return;
+        }
     }//GEN-LAST:event_txtHorarioBuscarActionPerformed
 
     private void btnMarcar1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMarcar1ActionPerformed

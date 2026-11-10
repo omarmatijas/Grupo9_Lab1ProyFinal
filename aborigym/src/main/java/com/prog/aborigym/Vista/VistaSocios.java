@@ -211,11 +211,29 @@ public class VistaSocios extends javax.swing.JInternalFrame {
         lblDniBuscar.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         lblDniBuscar.setText("DNI");
 
+        txtDniBuscar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtDniBuscarActionPerformed(evt);
+            }
+        });
+
         lblNombreBuscar.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         lblNombreBuscar.setText("Nombre");
 
+        txtNombreBuscar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtNombreBuscarActionPerformed(evt);
+            }
+        });
+
         lblApellidoBuscar.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         lblApellidoBuscar.setText("Apellido");
+
+        txtApellidoBuscar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtApellidoBuscarActionPerformed(evt);
+            }
+        });
 
         btnGrpActivar.add(radioTodos);
         radioTodos.setSelected(true);
@@ -322,6 +340,11 @@ public class VistaSocios extends javax.swing.JInternalFrame {
         txtId.setEditable(false);
 
         txtCorreo.setEditable(false);
+        txtCorreo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtCorreoActionPerformed(evt);
+            }
+        });
 
         lblTelefono1.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         lblTelefono1.setText("Activo");
@@ -333,6 +356,11 @@ public class VistaSocios extends javax.swing.JInternalFrame {
         lblCorreo.setText("Correo");
 
         txtDni.setEditable(false);
+        txtDni.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtDniActionPerformed(evt);
+            }
+        });
 
         btnGuardar.setBackground(new java.awt.Color(102, 204, 255));
         btnGuardar.setText("Guardar");
@@ -346,6 +374,11 @@ public class VistaSocios extends javax.swing.JInternalFrame {
         lblNombre.setText("Nombre");
 
         txtNombre.setEditable(false);
+        txtNombre.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtNombreActionPerformed(evt);
+            }
+        });
 
         btnNuevo.setBackground(new java.awt.Color(153, 255, 153));
         btnNuevo.setText("Nuevo");
@@ -364,11 +397,21 @@ public class VistaSocios extends javax.swing.JInternalFrame {
         lblApellido.setText("Apellido");
 
         txtApellido.setEditable(false);
+        txtApellido.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtApellidoActionPerformed(evt);
+            }
+        });
 
         lblEdad.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         lblEdad.setText("Edad");
 
         txtEdad.setEditable(false);
+        txtEdad.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtEdadActionPerformed(evt);
+            }
+        });
 
         btnEditar.setBackground(new java.awt.Color(255, 255, 153));
         btnEditar.setText("Editar");
@@ -516,11 +559,47 @@ public class VistaSocios extends javax.swing.JInternalFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void txtCorreoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtCorreoActionPerformed
+        Validaciones.revisarCorreo(this, txtCorreo);
+    }//GEN-LAST:event_txtCorreoActionPerformed
+
     private void txtTelefonoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtTelefonoActionPerformed
-        // TODO add your handling code here:
+        Validaciones.revisarTelefono(this, txtTelefono);
     }//GEN-LAST:event_txtTelefonoActionPerformed
 
+    private void txtEdadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtEdadActionPerformed
+        Validaciones.revisarEdad(this, txtEdad);
+    }//GEN-LAST:event_txtEdadActionPerformed
+
+    private void txtDniActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtDniActionPerformed
+        Validaciones.revisarDni(this, txtDni);
+    }//GEN-LAST:event_txtDniActionPerformed
+
+    private void txtDniBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtDniBuscarActionPerformed
+        Validaciones.revisarDni(this, txtDniBuscar);
+    }//GEN-LAST:event_txtDniBuscarActionPerformed
+
+    private void txtNombreActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtNombreActionPerformed
+        Validaciones.revisarLetras(this, txtNombre, "El nombre");
+    }//GEN-LAST:event_txtNombreActionPerformed
+
+    private void txtNombreBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtNombreBuscarActionPerformed
+        Validaciones.revisarLetras(this, txtNombreBuscar, "El nombre");
+    }//GEN-LAST:event_txtNombreBuscarActionPerformed
+
+    private void txtApellidoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtApellidoActionPerformed
+        Validaciones.revisarLetras(this, txtApellido, "El apellido");
+    }//GEN-LAST:event_txtApellidoActionPerformed
+
+    private void txtApellidoBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtApellidoBuscarActionPerformed
+        Validaciones.revisarLetras(this, txtApellidoBuscar, "El apellido");
+    }//GEN-LAST:event_txtApellidoBuscarActionPerformed
+
     private void btnBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarActionPerformed
+        if (!Validaciones.revisarDni(this, txtDniBuscar) || !Validaciones.revisarLetras(this, txtNombreBuscar, "El nombre")
+                || !Validaciones.revisarLetras(this, txtApellidoBuscar, "El apellido")) {
+            return;
+        }
         String dni = (String) txtDniBuscar.getText().trim();
         String apellido = txtApellidoBuscar.getText().trim();
         String nombre = txtNombreBuscar.getText().trim();
@@ -667,10 +746,16 @@ public class VistaSocios extends javax.swing.JInternalFrame {
             JOptionPane.showMessageDialog(this, "Ingrese el DNI.");
             return null;
         }
+        if (!Validaciones.revisarDni(this, txtDni)) {
+            return null;
+        }
 
         String nombre = (String) txtNombre.getText().trim();
         if (nombre == null || nombre.trim().isEmpty()) {
             JOptionPane.showMessageDialog(this, "Ingrese el nombre.");
+            return null;
+        }
+        if (!Validaciones.revisarLetras(this, txtNombre, "El nombre")) {
             return null;
         }
 
@@ -679,28 +764,30 @@ public class VistaSocios extends javax.swing.JInternalFrame {
             JOptionPane.showMessageDialog(this, "Ingrese el apellido.");
             return null;
         }
+        if (!Validaciones.revisarLetras(this, txtApellido, "El apellido")) {
+            return null;
+        }
 
-        int edad;
-        try {
-            edad = Integer.parseInt(txtEdad.getText().trim());
-        } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(this, "La edad debe ser un número entero.");
+        if (!Validaciones.revisarEdad(this, txtEdad)) {
             return null;
         }
-        if (edad <= 10) {
-            JOptionPane.showMessageDialog(this, "La edad debe ser mayor a 8.");
-            return null;
-        }
+        int edad = Integer.parseInt(txtEdad.getText().trim());
         
         String correo = (String) txtCorreo.getText().trim();
         if (correo == null || correo.trim().isEmpty()) {
             JOptionPane.showMessageDialog(this, "Ingrese el correo.");
             return null;
         }
+        if (!Validaciones.revisarCorreo(this, txtCorreo)) {
+            return null;
+        }
 
         String telefono = (String) txtTelefono.getText().trim();
         if (telefono == null || telefono.trim().isEmpty()) {
             JOptionPane.showMessageDialog(this, "Ingrese el teléfono.");
+            return null;
+        }
+        if (!Validaciones.revisarTelefono(this, txtTelefono)) {
             return null;
         }
 

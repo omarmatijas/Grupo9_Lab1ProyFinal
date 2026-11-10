@@ -254,6 +254,9 @@
           <Properties>
             <Property name="toolTipText" type="java.lang.String" value="HH:mm"/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="txtHorarioActionPerformed"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JLabel" name="lblCapacidad">
           <Properties>
@@ -398,6 +401,9 @@
           <Properties>
             <Property name="toolTipText" type="java.lang.String" value="HH:mm"/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="txtHorarioBuscarActionPerformed"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JComboBox" name="cboEntrenadorBuscar">
           <Properties>

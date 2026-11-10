@@ -8,7 +8,6 @@ import com.prog.aborigym.Persistencia.Conexion;
 import com.prog.aborigym.Persistencia.EntrenadorData;
 import java.sql.SQLException;
 import java.time.LocalTime;
-import java.time.format.DateTimeParseException;
 import java.util.List;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JComboBox;
@@ -278,11 +277,9 @@ public class VistaClases extends javax.swing.JInternalFrame {
     }
 
     private List<ClaseGym> filtrar(List<ClaseGym> clases) {
-        LocalTime horario;
-        try {
-            horario = FiltroClases.leerHorario(txtHorarioBuscar.getText());
-        } catch (DateTimeParseException ex) {
-            JOptionPane.showMessageDialog(this, FiltroClases.MENSAJE_HORARIO);
+        String textoHorario = txtHorarioBuscar.getText().trim();
+        LocalTime horario = Validaciones.leerHorario(this, txtHorarioBuscar, false);
+        if (!textoHorario.isEmpty() && horario == null) {
             return null;
         }
 
@@ -313,11 +310,8 @@ public class VistaClases extends javax.swing.JInternalFrame {
             return null;
         }
 
-        LocalTime horario;
-        try {
-            horario = LocalTime.parse(txtHorario.getText().trim(), FiltroClases.HORA);
-        } catch (DateTimeParseException ex) {
-            JOptionPane.showMessageDialog(this, "El horario debe tener el formato HH:mm, por ejemplo 18:30.");
+        LocalTime horario = Validaciones.leerHorario(this, txtHorario, true);
+        if (horario == null) {
             return null;
         }
 
@@ -429,6 +423,11 @@ public class VistaClases extends javax.swing.JInternalFrame {
         lblHorario.setText("Horario");
 
         txtHorario.setToolTipText("HH:mm");
+        txtHorario.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtHorarioActionPerformed(evt);
+            }
+        });
 
         lblCapacidad.setText("Capacidad");
 
@@ -527,6 +526,11 @@ public class VistaClases extends javax.swing.JInternalFrame {
         lblHorario1.setText("Horario");
 
         txtHorarioBuscar.setToolTipText("HH:mm");
+        txtHorarioBuscar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtHorarioBuscarActionPerformed(evt);
+            }
+        });
 
         cboEntrenadorBuscar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -693,6 +697,18 @@ public class VistaClases extends javax.swing.JInternalFrame {
             JOptionPane.showMessageDialog(this, ex.getMessage());
         }
     }//GEN-LAST:event_btnGuardarActionPerformed
+
+    private void txtHorarioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtHorarioActionPerformed
+        Validaciones.leerHorario(this, txtHorario, true);
+    }//GEN-LAST:event_txtHorarioActionPerformed
+
+    private void txtHorarioBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtHorarioBuscarActionPerformed
+        String texto = txtHorarioBuscar.getText().trim();
+        LocalTime horario = Validaciones.leerHorario(this, txtHorarioBuscar, false);
+        if (!texto.isEmpty() && horario == null) {
+            return;
+        }
+    }//GEN-LAST:event_txtHorarioBuscarActionPerformed
 
     private void btnBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarActionPerformed
         String disciplina = (String) cboDisciplinaBuscar.getSelectedItem();
